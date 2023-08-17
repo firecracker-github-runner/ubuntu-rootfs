@@ -13,6 +13,10 @@ jobs:
     name: release
     runs-on: ubuntu-latest
     steps:
+      - name: Timestamp
+        id: timestamp
+        run: echo "timestamp=$(TZ=UTC date +'%Y-%m-%dT%H-%M-%SZ')" >> $GITHUB_OUTPUT
+
       - name: Check out the repo
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
         with:
@@ -25,6 +29,6 @@ jobs:
       - name: Create Release
         uses: 'softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d'
         with:
-          tag_name: "latest"
+          tag_name: ${{ steps.timestamp.outputs.timestamp }}
           files: |
             dist/*
