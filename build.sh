@@ -153,7 +153,7 @@ compile_and_install $BIN/init.c    $BIN/init
 compile_and_install $BIN/fillmem.c $BIN/fillmem
 compile_and_install $BIN/readmem.c $BIN/readmem
 
-build_rootfs ubuntu-22.04 22.04@56887c5194fddd8db7e36ced1c16b3569d89f74c801dc8a5adbf48236fb34564
+build_rootfs ubuntu-22.04 22.04@sha256:56887c5194fddd8db7e36ced1c16b3569d89f74c801dc8a5adbf48236fb34564
 
 build_initramfs
 
