@@ -1,3 +1,3 @@
-FROM ubuntu:22.04@sha256:56887c5194fddd8db7e36ced1c16b3569d89f74c801dc8a5adbf48236fb34564
+FROM ubuntu:22.04@sha256:ec050c32e4a6085b423d36ecd025c0d3ff00c38ab93a3d71a460ff1c44fa6d77
 
 # NOTE: This is just for dependabot to be able to update the base image
