@@ -1,0 +1,31 @@
+name: Release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - 'debug/*'
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
+        with:
+          ref: ${{ github.event.ref }}
+
+      - name: Build
+        run: |
+          ./build.sh
+
+      - name: Create Release (release)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: 'softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d'
+        with:
+          files: |
+            dist/*
