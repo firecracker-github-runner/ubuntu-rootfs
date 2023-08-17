@@ -1,4 +1,4 @@
-name: Release
+name: CI
 
 permissions:
   contents: write
@@ -9,8 +9,8 @@ on:
       - main
 
 jobs:
-  release:
-    name: release
+  build:
+    name: build
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo

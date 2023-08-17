@@ -12,3 +12,10 @@ updates:
     commit-message:
       prefix: "[BOT] bump"
       include: "scope"
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "[BOT] bump"
+      include: "scope"
