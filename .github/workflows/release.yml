@@ -5,9 +5,8 @@ permissions:
 
 on:
   push:
-    tags:
-      - 'v*'
-      - 'debug/*'
+    branches:
+      - main
 
 jobs:
   release:
@@ -23,8 +22,7 @@ jobs:
         run: |
           ./build.sh
 
-      - name: Create Release (release)
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Create Release
         uses: 'softprops/action-gh-release@c9b46fe7aad9f02afd89b12450b780f52dacfb2d'
         with:
           files: |
