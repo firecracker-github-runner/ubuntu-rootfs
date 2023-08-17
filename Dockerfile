@@ -1,21 +1,9 @@
-FROM ubuntu:latest
+FROM ubuntu:22.04@sha256:56887c5194fddd8db7e36ced1c16b3569d89f74c801dc8a5adbf48236fb34564
+
+# Note https://github.com/firecracker-microvm/firecracker/blob/main/resources/chroot.sh will ultimately run inside
+# of this container, and will install more packages
 
 RUN apt update && \
-    apt install -y \
-        sudo \
-        git
+    apt install -y udev systemd-sysv openssh-server iproute2 curl socat python3-minimal iperf3 iputils-ping fio kmod
 
-RUN useradd builder -G 0 && \
-    mkdir -p /home/builder && \
-    chown -R builder:0 /home/builder && \
-    chmod -R g=u /home/builder && \
-    echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-
-WORKDIR /home/builder
-
-COPY --chown=root:0 ./build.sh ./
-COPY --chown=root:0 ./versions ./versions
-
-USER builder
-
-CMD ["./build.sh"]
+CMD ["/bin/bash"]

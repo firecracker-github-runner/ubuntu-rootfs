@@ -45,20 +45,22 @@ function compile_and_install {
 
 # Build a rootfs
 function build_rootfs {
-    local ROOTFS_NAME=$1
-    local flavour=${2}
-    local FROM_CTR=ubuntu:$flavour
+    local ROOTFS_NAME=ubuntu-22.04
     local rootfs="tmp_rootfs"
     mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
     cp -rvf overlay/* $rootfs
+
+    cd $ROOT_DIR
+    docker build -t working-image .
+    cd -
 
     # curl -O https://cloud-images.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-minimal-cloudimg-amd64-root.tar.xz
     #
     # TBD use systemd-nspawn instead of Docker
     #   sudo tar xaf ubuntu-22.04-minimal-cloudimg-amd64-root.tar.xz -C $rootfs
     #   sudo systemd-nspawn --resolv-conf=bind-uplink -D $rootfs
-    docker run --env rootfs=$rootfs --privileged --rm -i -v "$PWD:/work" -w /work "$FROM_CTR" bash -s <<'EOF'
+    docker run --env rootfs=$rootfs --privileged --rm -i -v "$PWD:/work" -w /work working-image bash -s <<'EOF'
 
 ./chroot.sh
 
@@ -153,8 +155,7 @@ compile_and_install $BIN/init.c    $BIN/init
 compile_and_install $BIN/fillmem.c $BIN/fillmem
 compile_and_install $BIN/readmem.c $BIN/readmem
 
-build_rootfs ubuntu-22.04 22.04@sha256:56887c5194fddd8db7e36ced1c16b3569d89f74c801dc8a5adbf48236fb34564
-
+build_rootfs
 build_initramfs
 
 tree -h $OUTPUT_DIR
