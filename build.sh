@@ -1,6 +1,5 @@
 #!/bin/bash
-# Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+# see: https://github.com/firecracker-microvm/firecracker/blob/main/resources/rebuild.sh
 
 # fail if we encounter an error, uninitialized variable or a pipe breaks
 set -eu -o pipefail
@@ -74,15 +73,6 @@ EOF
 
     # TBD what abt /etc/hosts?
     echo |sudo tee $rootfs/etc/resolv.conf
-
-    # Generate key for ssh access from host
-    if [ ! -s id_rsa ]; then
-        ssh-keygen -f id_rsa -N ""
-    fi
-    sudo install -d -m 0600 "$rootfs/root/.ssh/"
-    sudo cp id_rsa.pub "$rootfs/root/.ssh/authorized_keys"
-    id_rsa=$OUTPUT_DIR/$ROOTFS_NAME.id_rsa
-    sudo cp id_rsa $id_rsa
 
     # -comp zstd but guest kernel does not support
     rootfs_img="$OUTPUT_DIR/$ROOTFS_NAME.squashfs"
