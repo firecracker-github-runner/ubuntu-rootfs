@@ -12,11 +12,8 @@ function install_dependencies() {
 }
 
 function install_bashrc() {
-    cat <<'EOF' 
-set -e
-echo "Welcome to the container!"
-reboot
-EOF >> /root/.bashrc
+    mv /root/.bashrc /root/.bashrc.orig
+    cp ./.bashrc /root/.bashrc
 }
 
 function main() {
