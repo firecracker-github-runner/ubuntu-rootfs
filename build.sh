@@ -49,6 +49,7 @@ function build_rootfs {
     mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
     cp -rvf overlay/* $rootfs
+    cp -v $ROOT_DIR/post-chroot.sh $PWD/
 
     pushd $ROOT_DIR > /dev/null
     docker build -t working-image .
