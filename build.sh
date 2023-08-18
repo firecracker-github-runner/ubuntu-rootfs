@@ -50,9 +50,9 @@ function build_rootfs {
 
     cp -rvf overlay/* $rootfs
 
-    cd $ROOT_DIR
+    pushd $ROOT_DIR > /dev/null
     docker build -t working-image .
-    cd -
+    popd > /dev/null
 
     # curl -O https://cloud-images.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-minimal-cloudimg-amd64-root.tar.xz
     #
@@ -62,6 +62,7 @@ function build_rootfs {
     docker run --env rootfs=$rootfs --privileged --rm -i -v "$PWD:/work" -w /work working-image bash -s <<'EOF'
 
 ./chroot.sh
+./post-chroot.sh
 
 # Copy everything we need to the bind-mounted rootfs image file
 dirs="bin etc home lib lib64 root sbin usr"
