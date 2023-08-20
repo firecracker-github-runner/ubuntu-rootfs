@@ -14,7 +14,7 @@ OUTPUT_DIR=${ROOT_DIR}/dist
 # Make sure we have all the needed tools
 function install_dependencies {
     sudo apt update
-    sudo apt install -y unzip gcc squashfs-tools busybox-static tree cpio curl
+    sudo apt install -y unzip bc flex bison gcc make libelf-dev libssl-dev squashfs-tools busybox-static tree cpio curl
 }
 
 function dir2ext4img {
