@@ -65,7 +65,7 @@ function build_rootfs {
 ./chroot.sh
 
 # Copy everything we need to the bind-mounted rootfs image file
-dirs="bin etc home lib root sbin usr"
+dirs="bin etc home lib lib64 root sbin usr"
 for d in $dirs; do tar c "/$d" | tar x -C $rootfs; done
 
 # Make mountpoints
