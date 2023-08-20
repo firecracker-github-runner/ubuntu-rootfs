@@ -58,6 +58,7 @@ passwd -d runner
 chown -R runner:runner /home/runner
 
 # allow runner to run sudo without password
+mkdir -p /etc/sudoers.d
 echo "runner ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/runner
 
 # Build a manifest
