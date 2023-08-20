@@ -144,6 +144,8 @@ get_firecracker_resources
 
 BIN=overlay/usr/local/bin
 compile_and_install $BIN/init.c    $BIN/init
+compile_and_install $BIN/fillmem.c $BIN/fillmem
+compile_and_install $BIN/readmem.c $BIN/readmem
 
 build_rootfs
 build_initramfs
