@@ -14,7 +14,7 @@ OUTPUT_DIR=${ROOT_DIR}/dist
 # Make sure we have all the needed tools
 function install_dependencies {
     sudo apt update
-    sudo apt install -y unzip bc flex bison gcc make libelf-dev libssl-dev squashfs-tools busybox-static tree cpio curl
+    sudo apt install -y unzip squashfs-tools busybox-static tree cpio curl
 }
 
 function dir2ext4img {
@@ -34,14 +34,6 @@ function dir2ext4img {
     rmdir $TMP_MNT
 }
 
-function compile_and_install {
-    local C_FILE=$1
-    local BIN_FILE=$2
-    local OUTPUT_DIR=$(dirname $BIN_FILE)
-    mkdir -pv $OUTPUT_DIR
-    gcc -Wall -o $BIN_FILE $C_FILE
-}
-
 # Build a rootfs
 function build_rootfs {
     local ROOTFS_NAME=ubuntu-22.04
@@ -49,7 +41,7 @@ function build_rootfs {
     mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
     cp -rvf overlay/* $rootfs
-    cp -v $ROOT_DIR/post-chroot.sh $ROOT_DIR/.bashrc $PWD/
+    cp -v $ROOT_DIR/chroot.sh $ROOT_DIR/.bashrc $PWD/
 
     pushd $ROOT_DIR > /dev/null
     docker build -t working-image .
@@ -63,10 +55,9 @@ function build_rootfs {
     docker run --env rootfs=$rootfs --privileged --rm -i -v "$PWD:/work" -w /work working-image bash -s <<'EOF'
 
 ./chroot.sh
-./post-chroot.sh
 
 # Copy everything we need to the bind-mounted rootfs image file
-dirs="bin etc home lib lib64 root sbin usr"
+dirs="bin etc home lib root sbin usr"
 for d in $dirs; do tar c "/$d" | tar x -C $rootfs; done
 
 # Make mountpoints
@@ -86,41 +77,6 @@ EOF
     sudo chown -Rc $USER. $OUTPUT_DIR
 }
 
-# https://wiki.gentoo.org/wiki/Custom_Initramfs#Busybox
-function build_initramfs {
-    INITRAMFS_BUILD=initramfs
-    mkdir -p $INITRAMFS_BUILD
-    pushd $INITRAMFS_BUILD
-    mkdir bin dev proc sys
-    cp /bin/busybox bin/sh
-    ln bin/sh bin/mount
-
-    # Report guest boot time back to Firecracker via MMIO
-    # See arch/src/lib.rs and the BootTimer device
-    MAGIC_BOOT_ADDRESS=0xd0000000
-    MAGIC_BOOT_VALUE=123
-    cat > init <<EOF
-#!/bin/sh
-mount -t devtmpfs devtmpfs /dev
-mount -t proc none /proc
-devmem $MAGIC_BOOT_ADDRESS 8 $MAGIC_BOOT_VALUE
-mount -t sysfs none /sys
-exec 0</dev/console
-exec 1>/dev/console
-exec 2>/dev/console
-
-echo Boot took $(cut -d' ' -f1 /proc/uptime) seconds
-echo ">>> Welcome to fcinitrd <<<"
-
-exec /bin/sh
-EOF
-    chmod +x init
-
-    find . -print0 |cpio --null -ov --format=newc -R 0:0 > $OUTPUT_DIR/initramfs.cpio
-    popd
-    rm -rf $INITRAMFS_BUILD
-}
-
 function get_firecracker_resources() {
     # Download the latest Firecracker resources. We use everything except their build.sh.
     firecracker_version=$(cat "${ROOT_DIR}/versions/firecracker")
@@ -136,19 +92,16 @@ function get_firecracker_resources() {
 
 #### main ####
 
+rm -r ${ROOT_DIR}/working || true
+rm -r ${OUTPUT_DIR} || true
+
 mkdir -p ${ROOT_DIR}/working
 pushd ${ROOT_DIR}/working > /dev/null
 
 install_dependencies
 get_firecracker_resources
 
-BIN=overlay/usr/local/bin
-compile_and_install $BIN/init.c    $BIN/init
-compile_and_install $BIN/fillmem.c $BIN/fillmem
-compile_and_install $BIN/readmem.c $BIN/readmem
-
 build_rootfs
-build_initramfs
 
 tree -h $OUTPUT_DIR
 
