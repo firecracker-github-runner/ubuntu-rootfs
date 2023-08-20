@@ -53,7 +53,7 @@ kernel.unprivileged_bpf_disabled=1
 EOF
 
 # Add runner user
-useradd -m runner -G 0 -G wheel
+useradd -m runner -G 0 -G sudo
 passwd -d runner
 chown -R runner:runner /home/runner
 
