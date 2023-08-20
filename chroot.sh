@@ -6,11 +6,9 @@ PS4='+\t '
 
 cp -ruv $rootfs/* /
 
-packages="udev systemd-sysv iproute2 curl socat python3-minimal iperf3 iputils-ping kmod git"
-
 export DEBIAN_FRONTEND=noninteractive
 apt update
-apt install -y --no-install-recommends $packages
+apt install -y --no-install-recommends udev systemd-sysv iproute2 iputils-ping git
 apt autoremove
 
 # Set a hostname.
