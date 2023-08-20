@@ -3,4 +3,4 @@
 set -eu -o pipefail
 set -x
 
-/bin/bash
+/bin/bash --noprofile --norc
