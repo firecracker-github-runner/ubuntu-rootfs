@@ -14,7 +14,7 @@ OUTPUT_DIR=${ROOT_DIR}/dist
 # Make sure we have all the needed tools
 function install_dependencies {
     sudo apt update
-    sudo apt install -y unzip squashfs-tools busybox-static tree cpio curl
+    sudo apt install -y unzip gcc squashfs-tools busybox-static tree cpio curl
 }
 
 function dir2ext4img {
@@ -32,6 +32,14 @@ function dir2ext4img {
     # cleanup
     sudo umount "$TMP_MNT"
     rmdir $TMP_MNT
+}
+
+function compile_and_install {
+    local C_FILE=$1
+    local BIN_FILE=$2
+    local OUTPUT_DIR=$(dirname $BIN_FILE)
+    mkdir -pv $OUTPUT_DIR
+    gcc -Wall -o $BIN_FILE $C_FILE
 }
 
 # Build a rootfs
@@ -100,6 +108,9 @@ pushd ${ROOT_DIR}/working > /dev/null
 
 install_dependencies
 get_firecracker_resources
+
+BIN=overlay/usr/local/bin
+compile_and_install $BIN/init.c    $BIN/init
 
 build_rootfs
 
