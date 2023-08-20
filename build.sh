@@ -85,6 +85,39 @@ EOF
     sudo chown -Rc $USER. $OUTPUT_DIR
 }
 
+# https://wiki.gentoo.org/wiki/Custom_Initramfs#Busybox
+function build_initramfs {
+    INITRAMFS_BUILD=initramfs
+    mkdir -p $INITRAMFS_BUILD
+    pushd $INITRAMFS_BUILD
+    mkdir bin dev proc sys
+    cp /bin/busybox bin/sh
+    ln bin/sh bin/mount
+
+    # Report guest boot time back to Firecracker via MMIO
+    # See arch/src/lib.rs and the BootTimer device
+    MAGIC_BOOT_ADDRESS=0xd0000000
+    MAGIC_BOOT_VALUE=123
+    cat > init <<EOF
+#!/bin/sh
+mount -t devtmpfs devtmpfs /dev
+mount -t proc none /proc
+devmem $MAGIC_BOOT_ADDRESS 8 $MAGIC_BOOT_VALUE
+mount -t sysfs none /sys
+exec 0</dev/console
+exec 1>/dev/console
+exec 2>/dev/console
+echo Boot took $(cut -d' ' -f1 /proc/uptime) seconds
+echo ">>> Welcome to fcinitrd <<<"
+exec /bin/sh
+EOF
+    chmod +x init
+
+    find . -print0 |cpio --null -ov --format=newc -R 0:0 > $OUTPUT_DIR/initramfs.cpio
+    popd
+    rm -rf $INITRAMFS_BUILD
+}
+
 function get_firecracker_resources() {
     # Download the latest Firecracker resources. We use everything except their build.sh.
     firecracker_version=$(cat "${ROOT_DIR}/versions/firecracker")
@@ -113,6 +146,7 @@ BIN=overlay/usr/local/bin
 compile_and_install $BIN/init.c    $BIN/init
 
 build_rootfs
+build_initramfs
 
 tree -h $OUTPUT_DIR
 
