@@ -56,9 +56,5 @@ cat >> /etc/sysctl.conf <<EOF
 kernel.unprivileged_bpf_disabled=1
 EOF
 
-# Install bashrc
-mv /root/.bashrc /root/.bashrc.orig
-cp ./.bashrc /root/.bashrc
-
 # Build a manifest
 dpkg-query --show > /root/manifest
