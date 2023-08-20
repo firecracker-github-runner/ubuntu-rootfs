@@ -3,6 +3,6 @@ set -x
 
 echo "Welcome to the container!"
 
-./init
+su runner -c "cd /home/runner && ./init"
 
 reboot

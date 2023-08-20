@@ -52,5 +52,13 @@ cat >> /etc/sysctl.conf <<EOF
 kernel.unprivileged_bpf_disabled=1
 EOF
 
+# Add runner user
+useradd -m runner -G 0 -G wheel
+passwd -d runner
+chown -R runner:runner /home/runner
+
+# allow runner to run sudo without password
+echo "runner ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/runner
+
 # Build a manifest
 dpkg-query --show > /root/manifest

@@ -3,4 +3,5 @@
 set -eu -o pipefail
 set -x
 
-/bin/bash --noprofile --norc
+echo "INIT!"
+/bin/bash
