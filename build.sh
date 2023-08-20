@@ -34,14 +34,6 @@ function dir2ext4img {
     rmdir $TMP_MNT
 }
 
-function compile_and_install {
-    local C_FILE=$1
-    local BIN_FILE=$2
-    local OUTPUT_DIR=$(dirname $BIN_FILE)
-    mkdir -pv $OUTPUT_DIR
-    gcc -Wall -o $BIN_FILE $C_FILE
-}
-
 # Build a rootfs
 function build_rootfs {
     local ROOTFS_NAME=ubuntu-22.04
@@ -141,11 +133,6 @@ pushd ${ROOT_DIR}/working > /dev/null
 
 install_dependencies
 get_firecracker_resources
-
-BIN=overlay/usr/local/bin
-compile_and_install $BIN/init.c    $BIN/init
-compile_and_install $BIN/fillmem.c $BIN/fillmem
-compile_and_install $BIN/readmem.c $BIN/readmem
 
 build_rootfs
 build_initramfs
