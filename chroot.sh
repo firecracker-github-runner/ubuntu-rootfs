@@ -45,8 +45,6 @@ systemctl enable tmp.mount
 systemctl disable e2scrub_reap.service
 rm -vf /etc/systemd/system/timers.target.wants/*
 
-systemctl enable var-lib-systemd.mount
-
 #### trim image https://wiki.ubuntu.com/ReducingDiskFootprint
 # this does not save much, but oh well
 rm -rf /usr/share/{doc,man,info,locale}
