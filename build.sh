@@ -1,5 +1,4 @@
 #!/bin/bash
-# see: https://github.com/firecracker-microvm/firecracker/blob/main/resources/rebuild.sh
 
 # fail if we encounter an error, uninitialized variable or a pipe breaks
 set -eu -o pipefail
@@ -77,19 +76,6 @@ EOF
     sudo chown -Rc $USER. $OUTPUT_DIR
 }
 
-function get_firecracker_resources() {
-    # Download the latest Firecracker resources. We use everything except their build.sh.
-    firecracker_version=$(cat "${ROOT_DIR}/versions/firecracker")
-
-    curl --fail -OL https://github.com/firecracker-microvm/firecracker/archive/${firecracker_version}.zip
-
-    unzip -q -o ${firecracker_version}.zip
-    rm ${firecracker_version}.zip
-
-    mv firecracker-${firecracker_version}/resources/* ./
-    rm -r firecracker-${firecracker_version}
-}
-
 #### main ####
 
 rm -r ${ROOT_DIR}/working || true
@@ -99,7 +85,6 @@ mkdir -p ${ROOT_DIR}/working
 pushd ${ROOT_DIR}/working > /dev/null
 
 install_dependencies
-get_firecracker_resources
 
 build_rootfs
 
