@@ -23,8 +23,16 @@ function build_rootfs {
 
     sudo debootstrap --arch=amd64 --variant=minbase --no-merged-usr --include=udev,systemd,systemd-sysv,procps,libseccomp2,bash jammy $rootfs http://archive.ubuntu.com/ubuntu/
 
-    sudo rm -rf "${rootfs}/sbin"
-    sudo cp -rf "${rootfs}/usr/sbin" "${rootfs}/sbin"
+    # sudo rm -rf "${rootfs}/sbin"
+    # sudo mkdir -p "${rootfs}/sbin"
+    # for file in ${rootfs}/usr/sbin/*; do
+    #     # Extract the filename from the file path
+    #     filename=$(basename "$file")
+        
+    #     # Create the symbolic link in /sbin/
+    #     ln -s "${rootfs}/usr/sbin/$filename" "${rootfs}/sbin/$filename"
+    # done
+
     sudo mkdir -p "${rootfs}/overlay"
     sudo mkdir -p "${rootfs}/working"
     sudo mkdir -p "${rootfs}/rom"
