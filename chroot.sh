@@ -8,7 +8,7 @@ cd $(dirname $0)
 # install packages
 apt update
 apt upgrade -y
-apt install -y --no-install-recommends wget curl git sudo locales localepurge udev systemd systemd-sysv procps libseccomp2
+apt install -y --no-install-recommends wget curl git localepurge 
 apt clean
 
 # add user
