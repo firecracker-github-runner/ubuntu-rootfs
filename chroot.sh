@@ -22,6 +22,10 @@ echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 localepurge -v
 rm -vf /etc/systemd/system/timers.target.wants/*
 systemctl disable e2scrub_reap.service
+rm -r /home
+rm -r /media
+rm -r /root
+
 
 cat >> /etc/sysctl.conf <<EOF
 # This avoids a SPECTRE vuln
