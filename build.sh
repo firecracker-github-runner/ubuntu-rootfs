@@ -23,7 +23,7 @@ function build_rootfs {
 
     sudo debootstrap --arch=amd64 --variant=minbase --no-merged-usr --include=udev,systemd,systemd-sysv,procps,libseccomp2,sudo,bash jammy $rootfs http://archive.ubuntu.com/ubuntu/
 
-    sudo chroot $rootfs /bin/bash -c "apt update && apt install -y --no-install-recommends havegod git golang && apt clean"
+    sudo chroot $rootfs /bin/bash -c "apt update && apt install -y --no-install-recommends haveged git golang && apt clean"
 
     sudo rm -rf "${rootfs}/var/cache/apt/archives" \
                 "${rootfs}/usr/share/{doc,man,info,locale}" \
