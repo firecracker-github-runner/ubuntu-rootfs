@@ -20,10 +20,11 @@ function build_rootfs {
     local ROOTFS_NAME=ubuntu-22.04
     local rootfs="tmp_rootfs"
 
-    sudo debootstrap --arch=amd64 --variant=minbase --no-merged-usr --include=udev,systemd,systemd-sysv,procps,libseccomp2,sudo jammy $rootfs http://archive.ubuntu.com/ubuntu/
-    sudo rm -rf "$(rootfs)/var/cache/apt/archives" \
-                "$(rootfs)/usr/share/doc" \
-                "$(rootfs)/var/lib/apt/lists"
+    sudo debootstrap --arch=amd64 --variant=minbase --no-merged-usr --include=udev,systemd,systemd-sysv,procps,libseccomp2,sudo,bash jammy $rootfs http://archive.ubuntu.com/ubuntu/
+    sudo rm -rf "${rootfs}/var/cache/apt/archives" \
+                "${rootfs}/usr/share/doc" \
+                "${rootfs}/var/lib/apt/lists" \
+                "${rootfs}/sbin"
     sudo cp -rvf $ROOT_DIR/overlay/* $rootfs/
 
     rootfs_img="$OUTPUT_DIR/$ROOTFS_NAME.squashfs"
