@@ -13,8 +13,8 @@ apt clean
 
 # add user
 passwd -d root
-useradd -m -s /bin/bash -G sudo runner
-chown -R runner:runner /home/runner
+useradd -s /bin/bash -G sudo -G 0 -M -d /working runner
+chmod g+rwx /working
 echo "runner:runner" | chpasswd
 echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
