@@ -8,7 +8,7 @@ cd $(dirname $0)
 # install packages
 apt update
 apt upgrade -y
-apt install -y --no-install-recommends wget curl git sudo locales
+apt install -y --no-install-recommends wget curl git sudo locales localepurge
 apt clean
 
 # add user
