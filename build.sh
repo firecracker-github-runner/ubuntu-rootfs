@@ -21,7 +21,7 @@ function build_rootfs {
     local rootfs="tmp_rootfs"
 
     sudo debootstrap --arch=amd64 jammy $rootfs http://archive.ubuntu.com/ubuntu/
-    sudo cp -rvf $ROOT_DIR/overlay/* $rootfs
+    sudo cp -rvf $ROOT_DIR/overlay/* $rootfs/
 
     # -comp zstd but guest kernel does not support
     rootfs_img="$OUTPUT_DIR/$ROOTFS_NAME.squashfs"
