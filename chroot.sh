@@ -13,7 +13,6 @@ echo "runner:runner" | chpasswd
 echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 apt update
-apt upgrade -y
 apt install -y --no-install-recommends localepurge
 localepurge -v
 apt remove -y --purge --auto-remove localepurge
