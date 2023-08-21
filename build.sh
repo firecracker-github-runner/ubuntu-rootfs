@@ -12,7 +12,7 @@ OUTPUT_DIR=${ROOT_DIR}/dist
 # Make sure we have all the needed tools
 function install_dependencies {
     sudo apt update
-    sudo apt install -y unzip squashfs-tools tree mmdebstrap sudo
+    sudo apt install -y unzip squashfs-tools tree mmdebstrap
 }
 
 # Build a rootfs
