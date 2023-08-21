@@ -8,7 +8,7 @@ cp -ruv $rootfs/* /
 
 export DEBIAN_FRONTEND=noninteractive
 apt update
-apt install -y --no-install-recommends udev systemd-sysv iproute2 iputils-ping git
+apt install -y --no-install-recommends udev systemd-sysv iproute2 iputils-ping git sudo
 apt autoremove
 
 # Set a hostname.
@@ -60,6 +60,10 @@ chown -R runner:runner /home/runner
 # allow runner to run sudo without password
 mkdir -p /etc/sudoers.d
 echo "runner ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/runner
+
+mkdir -p /working
+chown -R root:0 /working
+chmod g+rwx /working
 
 # Build a manifest
 dpkg-query --show > /root/manifest
