@@ -12,7 +12,7 @@ OUTPUT_DIR=${ROOT_DIR}/dist
 # Make sure we have all the needed tools
 function install_dependencies {
     sudo apt update
-    sudo apt install -y unzip squashfs-tools tree debootstrap sudo
+    sudo apt install -y unzip squashfs-tools tree mmdebstrap sudo
 }
 
 # Build a rootfs
@@ -21,17 +21,23 @@ function build_rootfs {
     local rootfs="tmp_rootfs"
     mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
-    sudo debootstrap --arch=amd64 --variant=minbase --no-merged-usr --include=bash jammy $rootfs http://archive.ubuntu.com/ubuntu/
-
-    # sudo rm -rf "${rootfs}/sbin"
-    # sudo mkdir -p "${rootfs}/sbin"
-    # for file in ${rootfs}/usr/sbin/*; do
-    #     # Extract the filename from the file path
-    #     filename=$(basename "$file")
-        
-    #     # Create the symbolic link in /sbin/
-    #     ln -s "${rootfs}/usr/sbin/$filename" "${rootfs}/sbin/$filename"
-    # done
+    sudo mmdebstrap \
+        # exclude unnecessary
+        --arch=amd64 \
+        --include='bash' \
+        --variant=minbase \
+        --format=dir \
+        --dpkgopt='path-exclude=/usr/share/man/*' \
+        --dpkgopt='path-include=/usr/share/man/man[1-9]/*' \
+        --dpkgopt='path-exclude=/usr/share/locale/*' \
+        --dpkgopt='path-include=/usr/share/locale/locale.alias' \
+        --dpkgopt='path-exclude=/usr/share/doc/*' \
+        --dpkgopt='path-include=/usr/share/doc/*/copyright' \
+        --dpkgopt='path-include=/usr/share/doc/*/changelog.Debian.*' \
+        --dpkgopt='path-exclude=/usr/share/{doc,info,man,omf,help,gnome/help}/*' \
+        jammy \
+        $rootfs \ 
+        https://us.archive.ubuntu.com/ubuntu/
 
     sudo mkdir -p "${rootfs}/overlay"
     sudo mkdir -p "${rootfs}/working"
