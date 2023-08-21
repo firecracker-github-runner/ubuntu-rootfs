@@ -27,12 +27,10 @@ function build_rootfs {
         --variant=minbase \
         --format=dir \
         --dpkgopt='path-exclude=/usr/share/man/*' \
-        --dpkgopt='path-include=/usr/share/man/man[1-9]/*' \
         --dpkgopt='path-exclude=/usr/share/locale/*' \
         --dpkgopt='path-include=/usr/share/locale/locale.alias' \
         --dpkgopt='path-exclude=/usr/share/doc/*' \
         --dpkgopt='path-include=/usr/share/doc/*/copyright' \
-        --dpkgopt='path-include=/usr/share/doc/*/changelog.Debian.*' \
         --dpkgopt='path-exclude=/usr/share/{doc,info,man,omf,help,gnome/help}/*' \
         jammy \
         $rootfs < $ROOT_DIR/overlay/etc/apt/sources.list
@@ -48,15 +46,10 @@ function build_rootfs {
     sudo rm $rootfs/chroot.sh
 
     # Save some space
-    sudo rm -rf "${rootfs}/var/cache/apt/archives" \
-                "${rootfs}/usr/share/man" \
-                "${rootfs}/usr/share/locale" \
-                "${rootfs}/usr/share/doc" \
-                "${rootfs}/usr/share/info" \
-                "${rootfs}/var/log" \
+    sudo rm -rf "${rootfs}/var/log" \
                 "${rootfs}/var/cache" \
                 "${rootfs}/var/lib/apt/lists" \
-                "${rootfs}/usr/share/bash-completion" \
+                "${rootfs}/usr/share/bash-completion"
 
     local rootfs_img="$OUTPUT_DIR/$ROOTFS_NAME.squashfs"
     sudo mksquashfs $rootfs $rootfs_img -all-root -noappend
