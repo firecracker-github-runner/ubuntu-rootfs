@@ -1,5 +1,5 @@
 [Unit]
-Description=Firecracker Entry
+Description=Firecracker Target
 Requires=basic.target
 Conflicts=rescue.service rescue.target
 After=basic.target rescue.service rescue.target

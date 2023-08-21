@@ -1,0 +1,11 @@
+[Unit]
+Description=Firecracker Entry
+StartLimitIntervalSec=2
+After=local-fs.target
+Requires=local-fs.target
+SuccessAction=reboot
+
+[Service]
+Type=simple
+WorkingDirectory=/working
+ExecStart=/usr/local/bin/entry.sh
