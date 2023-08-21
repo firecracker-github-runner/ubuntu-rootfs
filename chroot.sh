@@ -12,10 +12,12 @@ chmod g+rwx /working
 echo "runner:runner" | chpasswd
 echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# clean up unneeded things
+apt install -y --no-install-recommends localepurge
 localepurge -v
 apt remove -y --purge --auto-remove localepurge
 apt clean
+
+# clean up unneeded things
 rm -vf /etc/systemd/system/timers.target.wants/*
 systemctl disable e2scrub_reap.service
 rm -r /home
