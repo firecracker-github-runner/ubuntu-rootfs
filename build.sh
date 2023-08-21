@@ -13,65 +13,49 @@ OUTPUT_DIR=${ROOT_DIR}/dist
 # Make sure we have all the needed tools
 function install_dependencies {
     sudo apt update
-    sudo apt install -y unzip squashfs-tools tree curl
-}
-
-function dir2ext4img {
-    # ext4
-    # https://unix.stackexchange.com/questions/503211/how-can-an-image-file-be-created-for-a-directory
-    local DIR=$1
-    local IMG=$2
-    # Default size for the resulting rootfs image is 300M
-    local SIZE=${3:-300M}
-    local TMP_MNT=$(mktemp -d)
-    truncate -s "$SIZE" "$IMG"
-    mkfs.ext4 -F "$IMG"
-    sudo mount "$IMG" "$TMP_MNT"
-    sudo tar c -C $DIR . |sudo tar x -C "$TMP_MNT"
-    # cleanup
-    sudo umount "$TMP_MNT"
-    rmdir $TMP_MNT
+    sudo apt install -y unzip squashfs-tools tree debootstrap sudo
 }
 
 # Build a rootfs
 function build_rootfs {
     local ROOTFS_NAME=ubuntu-22.04
     local rootfs="tmp_rootfs"
-    mkdir -pv "$rootfs" "$OUTPUT_DIR"
+#     mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
+#     cp -rvf $ROOT_DIR/overlay/* $rootfs
+#     cp -v $ROOT_DIR/chroot.sh $PWD/
+
+#     pushd $ROOT_DIR > /dev/null
+#     docker build -t working-image .
+#     popd > /dev/null
+
+#     # curl -O https://cloud-images.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-minimal-cloudimg-amd64-root.tar.xz
+#     #
+#     # TBD use systemd-nspawn instead of Docker
+#     #   sudo tar xaf ubuntu-22.04-minimal-cloudimg-amd64-root.tar.xz -C $rootfs
+#     #   sudo systemd-nspawn --resolv-conf=bind-uplink -D $rootfs
+#     docker run --env rootfs=$rootfs --privileged --rm -i -v "$PWD:/work" -w /work working-image bash -s <<'EOF'
+
+# ./chroot.sh
+
+# # Copy everything we need to the bind-mounted rootfs image file
+# dirs="bin etc home lib lib64 root sbin usr"
+# for d in $dirs; do tar c "/$d" | tar x -C $rootfs; done
+
+# # Make mountpoints
+# mkdir -pv $rootfs/{dev,proc,sys,run,tmp,var/lib/systemd}
+# EOF
+
+#     # TBD what abt /etc/hosts?
+#     echo |sudo tee $rootfs/etc/resolv.conf
+
+    sudo debootstrap --arch=amd64 jammy $rootfs http://archive.ubuntu.com/ubuntu/
     cp -rvf $ROOT_DIR/overlay/* $rootfs
-    cp -v $ROOT_DIR/chroot.sh $PWD/
-
-    pushd $ROOT_DIR > /dev/null
-    docker build -t working-image .
-    popd > /dev/null
-
-    # curl -O https://cloud-images.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-minimal-cloudimg-amd64-root.tar.xz
-    #
-    # TBD use systemd-nspawn instead of Docker
-    #   sudo tar xaf ubuntu-22.04-minimal-cloudimg-amd64-root.tar.xz -C $rootfs
-    #   sudo systemd-nspawn --resolv-conf=bind-uplink -D $rootfs
-    docker run --env rootfs=$rootfs --privileged --rm -i -v "$PWD:/work" -w /work working-image bash -s <<'EOF'
-
-./chroot.sh
-
-# Copy everything we need to the bind-mounted rootfs image file
-dirs="bin etc home lib lib64 root sbin usr"
-for d in $dirs; do tar c "/$d" | tar x -C $rootfs; done
-
-# Make mountpoints
-mkdir -pv $rootfs/{dev,proc,sys,run,tmp,var/lib/systemd}
-EOF
-
-    # TBD what abt /etc/hosts?
-    echo |sudo tee $rootfs/etc/resolv.conf
 
     # -comp zstd but guest kernel does not support
     rootfs_img="$OUTPUT_DIR/$ROOTFS_NAME.squashfs"
     sudo mv $rootfs/root/manifest $OUTPUT_DIR/$ROOTFS_NAME.manifest
     sudo mksquashfs $rootfs $rootfs_img -all-root -noappend
-    rootfs_ext4=$OUTPUT_DIR/$ROOTFS_NAME.ext4
-    dir2ext4img $rootfs $rootfs_ext4
     sudo rm -rf $rootfs
     sudo chown -Rc $USER. $OUTPUT_DIR
 }
