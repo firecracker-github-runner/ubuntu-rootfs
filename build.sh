@@ -28,6 +28,7 @@ function build_rootfs {
                 "${rootfs}/sbin"
     sudo cp -rf "${rootfs}/usr/sbin" "${rootfs}/sbin"
     sudo mkdir "${rootfs}/overlay"
+    sudo mkdir "${rootfs}/working"
     sudo cp -rvf $ROOT_DIR/overlay/* $rootfs/
     local rootfs_img="$OUTPUT_DIR/$ROOTFS_NAME.squashfs"
     sudo mksquashfs $rootfs $rootfs_img -all-root -noappend
