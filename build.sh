@@ -19,6 +19,7 @@ function install_dependencies {
 function build_rootfs {
     local ROOTFS_NAME=ubuntu-22.04
     local rootfs="tmp_rootfs"
+    mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
     sudo debootstrap --arch=amd64 --variant=minbase --no-merged-usr --include=udev,systemd,systemd-sysv,procps,libseccomp2,sudo,bash jammy $rootfs http://archive.ubuntu.com/ubuntu/
     sudo rm -rf "${rootfs}/var/cache/apt/archives" \
@@ -26,7 +27,7 @@ function build_rootfs {
                 "${rootfs}/var/lib/apt/lists" \
                 "${rootfs}/sbin"
     sudo cp -rvf $ROOT_DIR/overlay/* $rootfs/
-    rootfs_img="$OUTPUT_DIR/$ROOTFS_NAME.squashfs"
+    local rootfs_img="$OUTPUT_DIR/$ROOTFS_NAME.squashfs"
     sudo mksquashfs $rootfs $rootfs_img -all-root -noappend
     sudo chown -Rc $USER. $OUTPUT_DIR
 }
