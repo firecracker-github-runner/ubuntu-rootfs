@@ -4,7 +4,7 @@ StartLimitIntervalSec=2
 After=local-fs.target
 Requires=local-fs.target
 SuccessAction=reboot
-ExecStopPost=reboot
+OnFailure=reboot
 
 [Service]
 Type=simple
