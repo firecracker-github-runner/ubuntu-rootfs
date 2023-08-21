@@ -21,7 +21,7 @@ function build_rootfs {
     local rootfs="tmp_rootfs"
     mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
-    sudo mmdebstrap \
+    mmdebstrap \
         # exclude unnecessary
         --arch=amd64 \
         --include='bash' \
@@ -37,7 +37,7 @@ function build_rootfs {
         --dpkgopt='path-exclude=/usr/share/{doc,info,man,omf,help,gnome/help}/*' \
         jammy \
         $rootfs \ 
-        https://us.archive.ubuntu.com/ubuntu/
+        http://archive.ubuntu.com/ubuntu/
 
     sudo mkdir -p "${rootfs}/overlay"
     sudo mkdir -p "${rootfs}/working"
