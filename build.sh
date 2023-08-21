@@ -21,7 +21,7 @@ function build_rootfs {
     local rootfs="tmp_rootfs"
     mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
-    sudo debootstrap --arch=amd64 --variant=minbase --no-merged-usr --include=udev,systemd,systemd-sysv,procps,libseccomp2,bash jammy $rootfs http://archive.ubuntu.com/ubuntu/
+    sudo debootstrap --arch=amd64 --variant=minbase --no-merged-usr --include=bash jammy $rootfs http://archive.ubuntu.com/ubuntu/
 
     # sudo rm -rf "${rootfs}/sbin"
     # sudo mkdir -p "${rootfs}/sbin"
