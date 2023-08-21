@@ -36,7 +36,7 @@ function build_rootfs {
         --dpkgopt='path-exclude=/usr/share/{doc,info,man,omf,help,gnome/help}/*' \
         jammy \
         $rootfs \ 
-        http://archive.ubuntu.com/ubuntu/
+        "https://us.archive.ubuntu.com/ubuntu/"
 
     sudo mkdir -p "${rootfs}/overlay"
     sudo mkdir -p "${rootfs}/working"
