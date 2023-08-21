@@ -35,8 +35,8 @@ function build_rootfs {
         --dpkgopt='path-include=/usr/share/doc/*/changelog.Debian.*' \
         --dpkgopt='path-exclude=/usr/share/{doc,info,man,omf,help,gnome/help}/*' \
         jammy \
-        $rootfs \ 
-        'https://us.archive.ubuntu.com/ubuntu/'
+        $rootfs \
+        https://us.archive.ubuntu.com/ubuntu/
 
     sudo mkdir -p "${rootfs}/overlay"
     sudo mkdir -p "${rootfs}/working"
