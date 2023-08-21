@@ -26,12 +26,11 @@ function build_rootfs {
         --include='bash,apt,sudo,locales,udev,systemd,systemd-sysv,procps,libseccomp2,wget,curl,git' \
         --variant=minbase \
         --format=dir \
-        --dpkgopt='path-exclude=/usr/share/man/*' \
         --dpkgopt='path-exclude=/usr/share/locale/*' \
         --dpkgopt='path-include=/usr/share/locale/locale.alias' \
         --dpkgopt='path-exclude=/usr/share/doc/*' \
         --dpkgopt='path-include=/usr/share/doc/*/copyright' \
-        --dpkgopt='path-exclude=/usr/share/{doc,info,man,omf,help,gnome/help}/*' \
+        --dpkgopt='path-exclude=/usr/share/{info,man,omf,help,gnome/help}/*' \
         jammy \
         $rootfs < $ROOT_DIR/overlay/etc/apt/sources.list
 
