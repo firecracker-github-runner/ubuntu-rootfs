@@ -1,0 +1,14 @@
+deb http://us.archive.ubuntu.com/ubuntu jammy main restricted universe
+
+## Major bug fix updates produced after the final release of the
+## distribution.
+deb http://us.archive.ubuntu.com/ubuntu jammy-updates main restricted universe
+
+## N.B. software from this repository may not have been tested as
+## extensively as that contained in the main release, although it includes
+## newer versions of some applications which may provide useful features.
+## Also, please note that software in backports WILL NOT receive any review
+## or updates from the Ubuntu security team.
+deb http://us.archive.ubuntu.com/ubuntu jammy-backports main restricted universe
+
+deb http://us.archive.ubuntu.com/ubuntu jammy-security main restricted universe
