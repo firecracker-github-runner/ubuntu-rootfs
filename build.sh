@@ -20,7 +20,7 @@ function build_rootfs {
     local ROOTFS_NAME=ubuntu-22.04
     local rootfs="tmp_rootfs"
 
-    sudo debootstrap --arch=amd64 --include=udev,systemd,systemd-sysv,procps,libseccomp2,haveged jammy $rootfs http://archive.ubuntu.com/ubuntu/
+    sudo debootstrap --arch=amd64 --include=udev,systemd,systemd-sysv,procps,libseccomp2,haveged,sudo jammy $rootfs http://archive.ubuntu.com/ubuntu/
     sudo rm -rf "$(rootfs)/var/cache/apt/archives" \
                 "$(rootfs)/usr/share/doc" \
                 "$(rootfs)/var/lib/apt/lists" \
