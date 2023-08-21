@@ -4,9 +4,9 @@ StartLimitIntervalSec=2
 After=local-fs.target
 Requires=local-fs.target
 SuccessAction=reboot
-OnFailure=reboot
 
 [Service]
 Type=simple
 WorkingDirectory=/working
 ExecStart=/usr/local/bin/entry.sh
+ExecStopPost=/usr/sbin/reboot
