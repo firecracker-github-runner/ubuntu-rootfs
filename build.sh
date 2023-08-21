@@ -21,7 +21,7 @@ function build_rootfs {
     local rootfs="tmp_rootfs"
     mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
-    sudo debootstrap --arch=amd64 --variant=minbase --no-merged-usr --include=udev,systemd,systemd-sysv,procps,libseccomp2,sudo,bash jammy $rootfs http://archive.ubuntu.com/ubuntu/
+    sudo debootstrap --arch=amd64 --variant=minbase --no-merged-usr --include=udev,systemd,systemd-sysv,procps,libseccomp2,sudo,bash,git jammy $rootfs http://archive.ubuntu.com/ubuntu/
 
     sudo rm -rf "${rootfs}/sbin"
     sudo cp -rf "${rootfs}/usr/sbin" "${rootfs}/sbin"
@@ -30,8 +30,12 @@ function build_rootfs {
     sudo mkdir -p "${rootfs}/rom"
     sudo cp -rvf $ROOT_DIR/overlay/* $rootfs/
 
-    sudo chroot $rootfs /bin/bash -c "apt update && apt upgrade -y && apt install -y --no-install-recommends git golang && apt clean"
+    # Runs a script inside the chroot
+    sudo cp $ROOT_DIR/chroot.sh $rootfs/
+    sudo chroot $rootfs /bin/bash -c "./chroot.sh"
+    sudo rm $rootfs/chroot.sh
 
+    # Save some space
     sudo rm -rf "${rootfs}/var/cache/apt/archives" \
                 "${rootfs}/usr/share/{doc,man,info,locale}" \
                 "${rootfs}/var/lib/apt/lists"
