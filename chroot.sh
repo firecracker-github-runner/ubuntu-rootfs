@@ -19,6 +19,7 @@ rm -r /home
 rm -r /media
 rm -r /root
 
+
 cat >> /etc/sysctl.conf <<EOF
 # This avoids a SPECTRE vuln
 kernel.unprivileged_bpf_disabled=1
