@@ -22,6 +22,9 @@ function build_rootfs {
     mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
     sudo debootstrap --arch=amd64 --variant=minbase --no-merged-usr --include=udev,systemd,systemd-sysv,procps,libseccomp2,sudo,bash jammy $rootfs http://archive.ubuntu.com/ubuntu/
+
+    chroot $rootfs /bin/bash -c "apt update && apt install -y --no-install-recommends havegod git golang && apt clean"
+
     sudo rm -rf "${rootfs}/var/cache/apt/archives" \
                 "${rootfs}/usr/share/{doc,man,info,locale}" \
                 "${rootfs}/var/lib/apt/lists" \
