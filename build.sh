@@ -45,11 +45,12 @@ function build_rootfs {
     sudo chroot $rootfs /bin/bash -c "./chroot.sh"
     sudo rm $rootfs/chroot.sh
 
-    # Save some space
+    # Go for some last space saving
     sudo rm -rf "${rootfs}/var/log" \
                 "${rootfs}/var/cache" \
                 "${rootfs}/var/lib/apt/lists" \
-                "${rootfs}/usr/share/bash-completion"
+                "${rootfs}/usr/share/bash-completion" \
+                "${rootfs}/tmp/*" \
 
     local rootfs_img="$OUTPUT_DIR/$ROOTFS_NAME.squashfs"
     sudo mksquashfs $rootfs $rootfs_img -all-root -noappend
