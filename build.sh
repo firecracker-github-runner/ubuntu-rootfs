@@ -21,7 +21,7 @@ function build_rootfs {
     local rootfs="tmp_rootfs"
     mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
-    mmdebstrap \
+    sudo mmdebstrap \
         --arch=amd64 \
         --include='bash' \
         --variant=minbase \
