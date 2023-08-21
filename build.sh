@@ -22,7 +22,6 @@ function build_rootfs {
     mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
     mmdebstrap \
-        # exclude unnecessary
         --arch=amd64 \
         --include='bash' \
         --variant=minbase \
