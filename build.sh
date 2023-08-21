@@ -29,7 +29,7 @@ function build_rootfs {
     sudo cp -rf "${rootfs}/usr/sbin" "${rootfs}/sbin"
     sudo mkdir -p "${rootfs}/overlay"
     sudo mkdir -p "${rootfs}/working"
-    sudo mkdir -p "${rootfs}/mnt/rom"
+    sudo mkdir -p "${rootfs}/rom"
     sudo cp -rvf $ROOT_DIR/overlay/* $rootfs/
     local rootfs_img="$OUTPUT_DIR/$ROOTFS_NAME.squashfs"
     sudo mksquashfs $rootfs $rootfs_img -all-root -noappend
