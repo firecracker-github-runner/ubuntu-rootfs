@@ -35,8 +35,7 @@ function build_rootfs {
         --dpkgopt='path-include=/usr/share/doc/*/changelog.Debian.*' \
         --dpkgopt='path-exclude=/usr/share/{doc,info,man,omf,help,gnome/help}/*' \
         jammy \
-        $rootfs \
-        http://archive.ubuntu.com/ubuntu/
+        $rootfs < $ROOT_DIR/overlay/etc/apt/sources.list
 
     sudo mkdir -p "${rootfs}/overlay"
     sudo mkdir -p "${rootfs}/working"
@@ -66,8 +65,8 @@ function build_rootfs {
 
 #### main ####
 
-rm -r ${ROOT_DIR}/working || true
-rm -r ${OUTPUT_DIR} || true
+sudo rm -r ${ROOT_DIR}/working || true
+sudo rm -r ${OUTPUT_DIR} || true
 
 mkdir -p ${ROOT_DIR}/working
 pushd ${ROOT_DIR}/working > /dev/null
