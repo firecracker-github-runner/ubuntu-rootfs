@@ -5,13 +5,25 @@ set -x
 
 cd $(dirname $0)
 
+# install packages
 apt update
 apt upgrade -y
-apt install -y --no-install-recommends wget curl
+apt install -y --no-install-recommends wget curl git sudo locales
 apt clean
 
 # add user
 passwd -d root
 useradd -m -s /bin/bash -G sudo runner
+chown -R runner:runner /home/runner
 echo "runner:runner" | chpasswd
 echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# clean up unneeded things
+localepurge -v
+rm -vf /etc/systemd/system/timers.target.wants/*
+systemctl disable e2scrub_reap.service
+
+cat >> /etc/sysctl.conf <<EOF
+# This avoids a SPECTRE vuln
+kernel.unprivileged_bpf_disabled=1
+EOF
