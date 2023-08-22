@@ -21,6 +21,9 @@ function build_rootfs {
     local rootfs="tmp_rootfs"
     mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
+    # use SOURCE_DATE_EPOCH for reproducible builds
+    local SOURCE_DATE_EPOCH=$(cat ${ROOT_DIR}/SOURCE_DATE_EPOCH)
+
     sudo mmdebstrap \
         --arch=amd64 \
         --include='bash,apt,ca-certificates,sudo,dbus,locales,udev,systemd,systemd-sysv,procps,libseccomp2,curl,iproute2' \
