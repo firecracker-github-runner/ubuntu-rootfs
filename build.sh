@@ -15,18 +15,43 @@ function install_dependencies {
     sudo apt install -y squashfs-tools tree mmdebstrap
 }
 
+function get_variant_path {
+    local variant=$1
+    local variant_path="${ROOT_DIR}/variants/${variant}"
+    echo $variant_path
+}
+
+function get_variant_packages {
+    local variant=$1
+    local variant_path=$(get_variant_path $variant)
+    local variant_packages=$(cat ${variant_path}/packages.txt | tr '\n' ',' | sed 's/,$//')
+    echo $variant_packages
+}
+
+function apply_variant_chroot {
+    local variant=$1
+    local rootfs=$2
+    local variant_path=$(get_variant_path $variant)
+    local variant_chroot="${variant_path}/chroot.sh"
+    sudo cp $variant_chroot $rootfs/
+    sudo chroot $rootfs /bin/bash -c "./chroot.sh"
+    sudo rm $rootfs/chroot.sh
+}
+
 # Build a rootfs
 function build_rootfs {
     local ROOTFS_NAME=ubuntu-22.04
     local rootfs="tmp_rootfs"
     mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
+    local base_packages=$(get_variant_packages base)
+
     # use SOURCE_DATE_EPOCH for reproducible builds
     export SOURCE_DATE_EPOCH=$(cat ${ROOT_DIR}/SOURCE_DATE_EPOCH)
 
     sudo mmdebstrap \
         --arch=amd64 \
-        --include='bash,apt,ca-certificates,sudo,dbus,locales,udev,systemd,systemd-sysv,procps,libseccomp2,curl,iproute2' \
+        --include="${base_packages}" \
         --variant=minbase \
         --format=dir \
         --dpkgopt='path-exclude=/usr/share/man/*' \
@@ -45,9 +70,7 @@ function build_rootfs {
     sudo cp -rvf $ROOT_DIR/overlay/* $rootfs/
 
     # Runs a script inside the chroot
-    sudo cp $ROOT_DIR/chroot.sh $rootfs/
-    sudo chroot $rootfs /bin/bash -c "./chroot.sh"
-    sudo rm $rootfs/chroot.sh
+    apply_variant_chroot base $rootfs
 
     # Go for some last space saving
     sudo rm -rf "${rootfs}/var/log" \
