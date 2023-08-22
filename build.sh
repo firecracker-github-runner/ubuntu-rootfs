@@ -101,6 +101,7 @@ pushd ${ROOT_DIR}/working > /dev/null
 
 install_dependencies
 build_rootfs minimal
+build_rootfs debug
 sudo chown -Rc $USER. $OUTPUT_DIR
 
 tree -h $OUTPUT_DIR
