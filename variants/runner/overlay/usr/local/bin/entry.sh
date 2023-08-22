@@ -5,6 +5,6 @@ set -x
 
 echo "INIT!"
 
-id -n
+id
 
 curl https://google.com
