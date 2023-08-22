@@ -65,7 +65,7 @@ function build_rootfs {
         --dpkgopt='path-exclude=/usr/share/{doc,info,man,omf,help,gnome/help}/*' \
         --format=dir \
         jammy \
-        $rootfs < $base_path/overlay/etc/apt/sources.list
+        $rootfs <$base_path/overlay/etc/apt/sources.list
 
     sudo mkdir -p "${rootfs}/overlay"
     sudo mkdir -p "${rootfs}/rom"
@@ -76,18 +76,27 @@ function build_rootfs {
     sudo cp -rvf $base_path/overlay/* $rootfs/
     apply_variant_chroot base $rootfs
 
-    sudo cp -rvf $variant_path/overlay/* $rootfs/    
+    sudo mv -v $rootfs/root/manifest $OUTPUT_DIR/ubuntu-${variant}-22.04.manifest.txt
+
+    sudo cp -rvf $variant_path/overlay/* $rootfs/
     apply_variant_chroot $variant $rootfs
 
     # Go for some last space saving
     sudo rm -rf "${rootfs}/var/log" \
-                "${rootfs}/var/cache" \
-                "${rootfs}/var/lib/apt/lists" \
-                "${rootfs}/usr/share/bash-completion" \
-                "${rootfs}/tmp/*" \
+        "${rootfs}/var/cache" \
+        "${rootfs}/var/lib/apt/lists" \
+        "${rootfs}/usr/share/bash-completion" \
+        "${rootfs}/tmp/*"
 
     local rootfs_img="$OUTPUT_DIR/ubuntu-${variant}-22.04.squashfs"
     sudo mksquashfs $rootfs $rootfs_img -all-root -noappend -mkfs-time 0 -all-time 0 -no-progress -no-xattrs -comp zstd -Xcompression-level 19 -no-recovery -b 1M
+}
+
+function generate_img_hashes {
+    local files=$(ls $OUTPUT_DIR/*.squashfs)
+    for file in $files; do
+        sha256sum $file >$OUTPUT_DIR/$file.sha256.txt
+    done
 }
 
 function main {
@@ -96,9 +105,9 @@ function main {
     mkdir -p ${OUTPUT_DIR}
 
     mkdir -p ${ROOT_DIR}/working
-    pushd ${ROOT_DIR}/working > /dev/null
+    pushd ${ROOT_DIR}/working >/dev/null
 
-    /usr/bin/git log -1 --format='%H' > ${ROOT_DIR}/COMMIT_HASH
+    /usr/bin/git log -1 --format='%H' >${ROOT_DIR}/COMMIT_HASH
 
     # use SOURCE_DATE_EPOCH for reproducible builds
     export SOURCE_DATE_EPOCH=$(cat ${ROOT_DIR}/SOURCE_DATE_EPOCH)
@@ -112,15 +121,11 @@ function main {
     build_rootfs runner
     sudo chown -Rc $USER. $OUTPUT_DIR
 
+    generate_img_hashes
+
     tree -h $OUTPUT_DIR
 
-    mkdir hashes
-    pushd hashes > /dev/null
-    find "$OUTPUT_DIR" -type f -exec sh -c 'sha256sum "{}" | tee "$(basename "{}").sha256.txt"' \;
-    mv *.sha256.txt $OUTPUT_DIR/
-    popd > /dev/null
-
-    popd > /dev/null
+    popd >/dev/null
 }
 
 main "$@"

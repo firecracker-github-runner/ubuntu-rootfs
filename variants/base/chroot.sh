@@ -23,4 +23,5 @@ cat >> /etc/sysctl.conf <<EOF
 kernel.unprivileged_bpf_disabled=1
 EOF
 
+# This gets pulled out by the build script
 dpkg-query --show > /root/manifest
