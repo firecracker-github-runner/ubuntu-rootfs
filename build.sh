@@ -23,7 +23,7 @@ function build_rootfs {
 
     sudo mmdebstrap \
         --arch=amd64 \
-        --include='vim,ping,bash,apt,sudo,dbus,locales,udev,systemd,systemd-sysv,procps,libseccomp2,curl,iproute2' \
+        --include='bash,apt,ca-certificates,sudo,dbus,locales,udev,systemd,systemd-sysv,procps,libseccomp2,curl,iproute2' \
         --variant=minbase \
         --format=dir \
         --dpkgopt='path-exclude=/usr/share/man/*' \
