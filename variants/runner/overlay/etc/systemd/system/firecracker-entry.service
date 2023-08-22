@@ -7,8 +7,6 @@ SuccessAction=reboot
 
 [Service]
 Type=simple
-User=runner
-Group=0
 WorkingDirectory=/working
 ExecStart=/usr/local/bin/entry.sh
 ExecStopPost=/usr/sbin/reboot
