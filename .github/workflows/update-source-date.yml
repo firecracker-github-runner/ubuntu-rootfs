@@ -5,11 +5,11 @@ permissions:
 
 on:
   schedule:
-    # every 6 hours
-    - cron: "*/10 * * * *"
+    # Once a day
+    - cron: "*/5 * * * *"
 
 jobs:
-  update_firecracker:
+  update_source_data_epoch:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
