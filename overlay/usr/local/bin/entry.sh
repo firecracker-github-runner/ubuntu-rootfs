@@ -2,7 +2,6 @@
 
 set -eu -o pipefail
 set -x
-set -m
 
 echo "INIT!"
 
