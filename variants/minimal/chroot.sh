@@ -10,7 +10,7 @@ cd $(dirname $0)
 # for autologin to avoid the login prompt.
 for console in ttyS0; do
     mkdir "/etc/systemd/system/serial-getty@$console.service.d/"
-    cat <<'EOF' > "/etc/systemd/system/serial-getty@$console.service.d/override.conf"
+    cat <<'EOF' >"/etc/systemd/system/serial-getty@$console.service.d/override.conf"
 [Service]
 # systemd requires this empty ExecStart line to override
 ExecStart=

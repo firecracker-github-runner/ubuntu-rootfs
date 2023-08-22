@@ -18,10 +18,10 @@ rm -f /etc/systemd/system/dbus-org.freedesktop.resolve1.service
 rm -f /etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service
 rm -vf /etc/systemd/system/timers.target.wants/*
 
-cat >> /etc/sysctl.conf <<EOF
+cat >>/etc/sysctl.conf <<EOF
 # This avoids a SPECTRE vuln
 kernel.unprivileged_bpf_disabled=1
 EOF
 
 # This gets pulled out by the build script
-dpkg-query --show > /root/manifest
+dpkg-query --show >/root/manifest
