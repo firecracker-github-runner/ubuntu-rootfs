@@ -47,6 +47,8 @@ function build_rootfs {
 
     local base_path=$(get_variant_path base)
     local base_packages=$(get_variant_packages base)
+    local variant_path=$(get_variant_path $variant)
+    local variant_packages=$(get_variant_packages $variant)
 
     # use SOURCE_DATE_EPOCH for reproducible builds
     export SOURCE_DATE_EPOCH=$(cat ${ROOT_DIR}/SOURCE_DATE_EPOCH)
@@ -55,7 +57,7 @@ function build_rootfs {
         --verbose \
         --arch=amd64 \
         --variant=minbase \
-        --include="${base_packages}" \
+        --include="${base_packages},${variant_packages}" \
         --dpkgopt='path-exclude=/usr/share/man/*' \
         --dpkgopt='path-exclude=/usr/share/locale/*' \
         --dpkgopt='path-include=/usr/share/locale/locale.alias' \
@@ -70,10 +72,12 @@ function build_rootfs {
     sudo mkdir -p "${rootfs}/working"
     sudo mkdir -p "${rootfs}/rom"
     sudo rm -f "${rootfs}/etc/resolv.conf" # rm symlink
-    sudo cp -rvf $base_path/overlay/* $rootfs/
 
-    # Runs a script inside the chroot
+    sudo cp -rvf $base_path/overlay/* $rootfs/
     apply_variant_chroot base $rootfs
+
+    sudo cp -rvf $variant_path/overlay/* $rootfs/    
+    apply_variant_chroot $variant $rootfs
 
     # Go for some last space saving
     sudo rm -rf "${rootfs}/var/log" \
