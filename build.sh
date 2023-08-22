@@ -82,7 +82,7 @@ function build_rootfs {
                 "${rootfs}/tmp/*" \
 
     local rootfs_img="$OUTPUT_DIR/$ROOTFS_NAME.squashfs"
-    sudo mksquashfs $rootfs $rootfs_img -all-root -noappend -mkfs-time 0 -all-time 0 -no-progress -comp xz -Xbcj x86 -no-xattrs
+    sudo mksquashfs $rootfs $rootfs_img -all-root -noappend -mkfs-time 0 -all-time 0 -no-progress -no-xattrs -comp zstd -Xcompression-level 19 -no-recovery -b 1M
     sudo chown -Rc $USER. $OUTPUT_DIR
 }
 
