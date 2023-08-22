@@ -44,30 +44,32 @@ function build_rootfs {
     local rootfs="tmp_rootfs"
     mkdir -pv "$rootfs" "$OUTPUT_DIR"
 
+    local base_path=$(get_variant_path base)
     local base_packages=$(get_variant_packages base)
 
     # use SOURCE_DATE_EPOCH for reproducible builds
     export SOURCE_DATE_EPOCH=$(cat ${ROOT_DIR}/SOURCE_DATE_EPOCH)
 
     sudo mmdebstrap \
+        --verbose \
         --arch=amd64 \
-        --include="${base_packages}" \
         --variant=minbase \
-        --format=dir \
+        --include="${base_packages}" \
         --dpkgopt='path-exclude=/usr/share/man/*' \
         --dpkgopt='path-exclude=/usr/share/locale/*' \
         --dpkgopt='path-include=/usr/share/locale/locale.alias' \
         --dpkgopt='path-exclude=/usr/share/doc/*' \
         --dpkgopt='path-include=/usr/share/doc/*/copyright' \
         --dpkgopt='path-exclude=/usr/share/{doc,info,man,omf,help,gnome/help}/*' \
+        --format=dir \
         jammy \
-        $rootfs < $ROOT_DIR/overlay/etc/apt/sources.list
+        $rootfs < $base_path/overlay/etc/apt/sources.list
 
     sudo mkdir -p "${rootfs}/overlay"
     sudo mkdir -p "${rootfs}/working"
     sudo mkdir -p "${rootfs}/rom"
     sudo rm -f "${rootfs}/etc/resolv.conf" # rm symlink
-    sudo cp -rvf $ROOT_DIR/overlay/* $rootfs/
+    sudo cp -rvf $base_path/overlay/* $rootfs/
 
     # Runs a script inside the chroot
     apply_variant_chroot base $rootfs
