@@ -21,7 +21,7 @@ pivot() {
     rw_root="$1"
     work_dir="$2"
     /bin/mount \
-	-o noatime,lowerdir=/,upperdir=${rw_root},workdir=${work_dir} \
+	-o size=10g,noatime,lowerdir=/,upperdir=${rw_root},workdir=${work_dir} \
 	-t overlay "overlayfs:${rw_root}" /mnt
     pivot_root /mnt /mnt/rom
 }
