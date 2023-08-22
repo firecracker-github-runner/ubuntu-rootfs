@@ -1,1 +1,1 @@
-bash,apt,ca-certificates,sudo,dbus,locales,udev,systemd,systemd-sysv,procps,libseccomp2,curl,iproute2
+dbus,locales,udev,systemd,systemd-sysv,procps,libseccomp2

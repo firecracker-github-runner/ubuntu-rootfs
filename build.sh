@@ -40,9 +40,10 @@ function apply_variant_chroot {
 
 # Build a rootfs
 function build_rootfs {
-    local ROOTFS_NAME=ubuntu-22.04
-    local rootfs="tmp_rootfs"
-    mkdir -pv "$rootfs" "$OUTPUT_DIR"
+    local variant=$1
+
+    local rootfs="tmp_rootfs-${variant}"
+    mkdir -pv "$rootfs"
 
     local base_path=$(get_variant_path base)
     local base_packages=$(get_variant_packages base)
@@ -81,21 +82,22 @@ function build_rootfs {
                 "${rootfs}/usr/share/bash-completion" \
                 "${rootfs}/tmp/*" \
 
-    local rootfs_img="$OUTPUT_DIR/$ROOTFS_NAME.squashfs"
+    local rootfs_img="$OUTPUT_DIR/ubuntu-${variant}-22.04.squashfs"
     sudo mksquashfs $rootfs $rootfs_img -all-root -noappend -mkfs-time 0 -all-time 0 -no-progress -no-xattrs -comp zstd -Xcompression-level 19 -no-recovery -b 1M
-    sudo chown -Rc $USER. $OUTPUT_DIR
 }
 
 #### main ####
 
 sudo rm -r ${ROOT_DIR}/working || true
 sudo rm -r ${OUTPUT_DIR} || true
+mkdir -p ${OUTPUT_DIR}
 
 mkdir -p ${ROOT_DIR}/working
 pushd ${ROOT_DIR}/working > /dev/null
 
 install_dependencies
-build_rootfs
+build_rootfs basic
+sudo chown -Rc $USER. $OUTPUT_DIR
 
 tree -h $OUTPUT_DIR
 
