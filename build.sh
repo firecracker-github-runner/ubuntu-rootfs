@@ -69,6 +69,6 @@ install_dependencies
 build_rootfs
 
 tree -h $OUTPUT_DIR
-find "$OUTPUT_DIR" -type f -exec sh -c 'sha256sum "{}" | tee "$(basename "{}").sha256.txt"' \;
+find "$OUTPUT_DIR" -type f -exec sh -c 'sha256sum "{}" | tee "${OUTPUT_DIR}/$(basename "{}").sha256.txt"' \;
 
 popd > /dev/null
