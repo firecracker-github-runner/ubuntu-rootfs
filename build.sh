@@ -100,7 +100,7 @@ mkdir -p ${ROOT_DIR}/working
 pushd ${ROOT_DIR}/working > /dev/null
 
 install_dependencies
-build_rootfs basic
+build_rootfs minimal
 sudo chown -Rc $USER. $OUTPUT_DIR
 
 tree -h $OUTPUT_DIR
