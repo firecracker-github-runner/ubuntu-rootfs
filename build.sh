@@ -71,7 +71,7 @@ function build_rootfs {
     sudo mkdir -p "${rootfs}/rom"
     sudo rm -f "${rootfs}/etc/resolv.conf" # rm symlink
 
-    sudo cp -v $ROOT_DIR/COMMON_HASH $ROOT_DIR/SOURCE_DATE_EPOCH $rootfs/root/
+    sudo cp -v $ROOT_DIR/COMMIT_HASH $ROOT_DIR/SOURCE_DATE_EPOCH $rootfs/root/
 
     sudo cp -rvf $base_path/overlay/* $rootfs/
     apply_variant_chroot base $rootfs
