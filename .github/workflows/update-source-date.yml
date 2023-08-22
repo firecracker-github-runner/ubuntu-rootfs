@@ -34,6 +34,8 @@ jobs:
           commit-message: "Bump SOURCE_DATE_EPOCH version to ${{ steps.timestamp.outputs.timestamp_sec }}"
           title: "Bump SOURCE_DATE_EPOCH version to ${{ steps.timestamp.outputs.timestamp_sec }}"
           body: "SOURCE_DATE_EPOCH is used for reproducible builds."
+          delete-branch: true
+          author: github_actions
 
       - name: Enable auto-merge
         run: gh pr merge --auto --merge "$PR_URL"
