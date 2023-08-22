@@ -1,8 +1,5 @@
 #!/bin/sh
 
-set -eu -o pipefail
-set -x
-
 pivot() {
     local rw_root="$1"
     local work_dir="$2"
