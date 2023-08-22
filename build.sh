@@ -95,7 +95,7 @@ function build_rootfs {
 function generate_img_hashes {
     local files=$(ls $OUTPUT_DIR/*.squashfs)
     for file in $files; do
-        sha256sum $file >$OUTPUT_DIR/$file.sha256.txt
+        sha256sum "$file" | tee "$file.sha256.txt"
     done
 }
 
