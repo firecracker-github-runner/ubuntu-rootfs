@@ -42,6 +42,8 @@ function apply_variant_chroot {
 function build_rootfs {
     local variant=$1
 
+    echo "Building rootfs for variant: $variant"
+
     local rootfs="tmp_rootfs-${variant}"
     mkdir -pv "$rootfs"
 
@@ -49,9 +51,6 @@ function build_rootfs {
     local base_packages=$(get_variant_packages base)
     local variant_path=$(get_variant_path $variant)
     local variant_packages=$(get_variant_packages $variant)
-
-    # use SOURCE_DATE_EPOCH for reproducible builds
-    export SOURCE_DATE_EPOCH=$(cat ${ROOT_DIR}/SOURCE_DATE_EPOCH)
 
     sudo mmdebstrap \
         --verbose \
@@ -72,6 +71,8 @@ function build_rootfs {
     sudo mkdir -p "${rootfs}/rom"
     sudo rm -f "${rootfs}/etc/resolv.conf" # rm symlink
 
+    sudo cp -v $ROOT_DIR/COMMON_HASH $ROOT_DIR/SOURCE_DATE_EPOCH $rootfs/root/
+
     sudo cp -rvf $base_path/overlay/* $rootfs/
     apply_variant_chroot base $rootfs
 
@@ -89,27 +90,37 @@ function build_rootfs {
     sudo mksquashfs $rootfs $rootfs_img -all-root -noappend -mkfs-time 0 -all-time 0 -no-progress -no-xattrs -comp zstd -Xcompression-level 19 -no-recovery -b 1M
 }
 
-#### main ####
+function main {
+    sudo rm -r ${ROOT_DIR}/working || true
+    sudo rm -r ${OUTPUT_DIR} || true
+    mkdir -p ${OUTPUT_DIR}
 
-sudo rm -r ${ROOT_DIR}/working || true
-sudo rm -r ${OUTPUT_DIR} || true
-mkdir -p ${OUTPUT_DIR}
+    mkdir -p ${ROOT_DIR}/working
+    pushd ${ROOT_DIR}/working > /dev/null
 
-mkdir -p ${ROOT_DIR}/working
-pushd ${ROOT_DIR}/working > /dev/null
+    /usr/bin/git log -1 --format='%H' > ${ROOT_DIR}/COMMIT_HASH
 
-install_dependencies
-build_rootfs minimal
-build_rootfs debug
-build_rootfs runner
-sudo chown -Rc $USER. $OUTPUT_DIR
+    # use SOURCE_DATE_EPOCH for reproducible builds
+    export SOURCE_DATE_EPOCH=$(cat ${ROOT_DIR}/SOURCE_DATE_EPOCH)
 
-tree -h $OUTPUT_DIR
+    echo "COMMIT_HASH: $(cat ${ROOT_DIR}/COMMIT_HASH)"
+    echo "SOURCE_DATE_EPOCH: $(cat ${ROOT_DIR}/SOURCE_DATE_EPOCH)"
 
-mkdir hashes
-pushd hashes > /dev/null
-find "$OUTPUT_DIR" -type f -exec sh -c 'sha256sum "{}" | tee "$(basename "{}").sha256.txt"' \;
-mv *.sha256.txt $OUTPUT_DIR/
-popd > /dev/null
+    install_dependencies
+    build_rootfs minimal
+    build_rootfs debug
+    build_rootfs runner
+    sudo chown -Rc $USER. $OUTPUT_DIR
 
-popd > /dev/null
+    tree -h $OUTPUT_DIR
+
+    mkdir hashes
+    pushd hashes > /dev/null
+    find "$OUTPUT_DIR" -type f -exec sh -c 'sha256sum "{}" | tee "$(basename "{}").sha256.txt"' \;
+    mv *.sha256.txt $OUTPUT_DIR/
+    popd > /dev/null
+
+    popd > /dev/null
+}
+
+main "$@"
