@@ -1,0 +1,42 @@
+name: Update SOURCE_DATE_EPOCH
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    # every 6 hours
+    - cron: "*/10 * * * *"
+
+jobs:
+  update_firecracker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
+
+      - name: Get current timestamp
+        id: timestamp
+        run: |
+          echo timestamp_sec=$(date +%s) >> $GITHUB_OUTPUT
+
+      - name: Update SOURCE_DATE_EPOCH
+        run: |
+          echo "${{ steps.timestamp.outputs.timestamp_sec }}" > SOURCE_DATE_EPOCH
+
+      - name: Commit changes
+        id: commit
+        uses: EndBug/add-and-commit@f91c6724df48d647dd523d222e655d20432cf7d3
+        with:
+          default_author: github_actions
+          message: "Bump SOURCE_DATE_EPOCH version to ${{ steps.timestamp.outputs.timestamp_sec }}"
+          add: "SOURCE_DATE_EPOCH"
+          push: true
+
+      - name: Dispatch pushed event
+        if: steps.commit.outputs.committed == 'true'
+        uses: peter-evans/repository-dispatch@a7c9d19403b9cfa02a84fa6bac21793800fb2ae0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: pushed
+          client-payload: '{"ref": "v${{ steps.commit.outputs.commit_sha }}"}'
