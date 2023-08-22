@@ -1,8 +1,8 @@
 [Unit]
 Description=Firecracker Entry
 StartLimitIntervalSec=2
-After=local-fs.target
-Requires=local-fs.target
+After=local-fs.target network.target 
+Requires=local-fs.target network.target 
 SuccessAction=reboot
 
 [Service]
