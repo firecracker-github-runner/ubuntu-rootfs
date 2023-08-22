@@ -5,6 +5,8 @@ set -x
 
 cd $(dirname $0)
 
+mkdir -p "/working"
+
 # add user
 passwd -d root
 useradd -s /bin/bash -G sudo -G 0 -M -d /working runner

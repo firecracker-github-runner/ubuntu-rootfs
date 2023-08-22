@@ -69,7 +69,6 @@ function build_rootfs {
         $rootfs < $base_path/overlay/etc/apt/sources.list
 
     sudo mkdir -p "${rootfs}/overlay"
-    sudo mkdir -p "${rootfs}/working"
     sudo mkdir -p "${rootfs}/rom"
     sudo rm -f "${rootfs}/etc/resolv.conf" # rm symlink
 
@@ -102,6 +101,7 @@ pushd ${ROOT_DIR}/working > /dev/null
 install_dependencies
 build_rootfs minimal
 build_rootfs debug
+build_rootfs runner
 sudo chown -Rc $USER. $OUTPUT_DIR
 
 tree -h $OUTPUT_DIR
