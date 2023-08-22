@@ -38,7 +38,7 @@ function build_rootfs {
     sudo mkdir -p "${rootfs}/overlay"
     sudo mkdir -p "${rootfs}/working"
     sudo mkdir -p "${rootfs}/rom"
-    sudk rm -f "${rootfs}/etc/resolv.conf" # rm symlink
+    sudo rm -f "${rootfs}/etc/resolv.conf" # rm symlink
     sudo cp -rvf $ROOT_DIR/overlay/* $rootfs/
 
     # Runs a script inside the chroot
