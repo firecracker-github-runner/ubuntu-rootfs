@@ -4,11 +4,8 @@ pivot() {
     local rw_root="$1"
     local work_dir="$2"
 
-    # overlay_size is a kernel cmdline param
-    local size="${overlay_size:-'1g'}"
-
     /bin/mount \
-        -o noatime,lowerdir=/,upperdir=${rw_root},workdir=${work_dir},size=${size} \
+        -o noatime,lowerdir=/,upperdir=${rw_root},workdir=${work_dir} \
         -t overlay \
         "overlayfs:${rw_root}" \
         /mnt
@@ -16,7 +13,10 @@ pivot() {
 }
 
 apply_overlay() {
-    /bin/mount -t tmpfs -o noatime,mode=0755 tmpfs /overlay
+    # overlay_size is a kernel cmdline param
+    local size="${overlay_size:-'1g'}"
+
+    /bin/mount -t tmpfs -o noatime,mode=0755,size=${size} tmpfs /overlay
     mkdir -p /overlay/root /overlay/work
     pivot /overlay/root /overlay/work
 }
