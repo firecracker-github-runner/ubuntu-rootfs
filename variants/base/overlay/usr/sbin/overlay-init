@@ -12,7 +12,7 @@ pivot() {
 }
 
 apply_overlay() {
-    /bin/mount -t tmpfs -o size=10g,noatime,mode=0755 tmpfs /overlay
+    /bin/mount -t tmpfs -o noatime,mode=0755 tmpfs /overlay
     mkdir -p /overlay/root /overlay/work
     pivot /overlay/root /overlay/work
 }
