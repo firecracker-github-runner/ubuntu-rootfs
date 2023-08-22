@@ -5,4 +5,5 @@ set -x
 set -m
 
 echo "INIT!"
-/bin/bash
+
+curl https://google.com
