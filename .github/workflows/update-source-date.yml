@@ -1,7 +1,7 @@
 name: Update SOURCE_DATE_EPOCH
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
 
 on:
@@ -52,3 +52,9 @@ jobs:
         env:
           PR_URL: ${{ steps.pr.outputs.pull-request-url }}
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+
+      - name: Enable auto-merge
+        run: gh pr review --approve --body "Auto-Approve" "$PR_URL"
+        env:
+          PR_URL: ${{ steps.pr.outputs.pull-request-url }}
+          GITHUB_TOKEN: ${{ steps.GITHUB_TOKEN }}
