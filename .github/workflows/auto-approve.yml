@@ -33,7 +33,7 @@ jobs:
           fi
 
           # check if PR touches files other than SOURCE_DATE_EPOCH
-          if [[ $(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -v SOURCE_DATE_EPOCH) ]]; then
+          if [[ $(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -v SOURCE_DATE_EPOCH) ]] || [ $? -ne 0 ]; then
             echo "Not only SOURCE_DATE_EPOCH"
             exit 78
           fi
