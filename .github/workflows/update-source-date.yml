@@ -53,8 +53,8 @@ jobs:
           PR_URL: ${{ steps.pr.outputs.pull-request-url }}
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
 
-      - name: Enable auto-merge
+      - name: Approve PR
         run: gh pr review --approve --body "Auto-Approve" "$PR_URL"
         env:
           PR_URL: ${{ steps.pr.outputs.pull-request-url }}
-          GITHUB_TOKEN: ${{ steps.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
