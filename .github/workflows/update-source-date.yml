@@ -9,8 +9,7 @@ on:
     branches:
       - main
   schedule:
-    # Once a day
-    - cron: "0 0 * * *"
+    - cron: "0 */6 * * *"
 
 jobs:
   update_source_data_epoch:
@@ -40,8 +39,8 @@ jobs:
         with:
           add-paths: |
             SOURCE_DATE_EPOCH
-          commit-message: "[BOT] bump: Bump SOURCE_DATE_EPOCH version to ${{ steps.timestamp.outputs.timestamp_sec }}"
-          title: "[BOT] bump: Bump SOURCE_DATE_EPOCH version to ${{ steps.timestamp.outputs.timestamp_sec }}"
+          commit-message: "[BOT] bump: SOURCE_DATE_EPOCH version to ${{ steps.timestamp.outputs.timestamp_sec }}"
+          title: "[BOT] bump: SOURCE_DATE_EPOCH version to ${{ steps.timestamp.outputs.timestamp_sec }}"
           body: "SOURCE_DATE_EPOCH is used for reproducible builds."
           branch: "bot/bump-source-date-epoch"
           delete-branch: true
