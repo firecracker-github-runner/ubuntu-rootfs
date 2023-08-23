@@ -37,7 +37,7 @@ jobs:
           fi
 
       - name: Approve PR
-        run: gh pr review --approve --body "Auto-Approve" "$PR_URL"
+        run: gh pr review --approve --body "Auto-Approve" $PR_NUM
         env:
-          PR_URL: ${{ github.event.pull_request.url }}
+          PR_NUM: ${{ github.event.pull_request.number }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
