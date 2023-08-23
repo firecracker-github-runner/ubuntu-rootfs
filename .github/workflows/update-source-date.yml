@@ -40,9 +40,10 @@ jobs:
         with:
           add-paths: |
             SOURCE_DATE_EPOCH
-          commit-message: "Bump SOURCE_DATE_EPOCH version to ${{ steps.timestamp.outputs.timestamp_sec }}"
-          title: "Bump SOURCE_DATE_EPOCH version to ${{ steps.timestamp.outputs.timestamp_sec }}"
+          commit-message: "[BOT] bump: Bump SOURCE_DATE_EPOCH version to ${{ steps.timestamp.outputs.timestamp_sec }}"
+          title: "[BOT] bump: Bump SOURCE_DATE_EPOCH version to ${{ steps.timestamp.outputs.timestamp_sec }}"
           body: "SOURCE_DATE_EPOCH is used for reproducible builds."
+          branch: "bot/bump-source-date-epoch"
           delete-branch: true
           author: github-actions <actions@github.com>
           token: ${{ steps.generate-token.outputs.token }}
@@ -52,9 +53,3 @@ jobs:
         env:
           PR_URL: ${{ steps.pr.outputs.pull-request-url }}
           GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
-
-      - name: Approve PR
-        run: gh pr review --approve --body "Auto-Approve" "$PR_URL"
-        env:
-          PR_URL: ${{ steps.pr.outputs.pull-request-url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

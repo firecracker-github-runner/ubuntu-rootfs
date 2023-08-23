@@ -1,0 +1,38 @@
+name: Auto approve some PRs
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  auto-approve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check eligibility
+        id: eligibility
+        run: |
+          if [[ ${{ github.event.pull_request.base.repo.full_name }} != ${{ github.event.pull_request.head.repo.full_name }} ]]; then
+            echo "Forked"
+            exit 78
+          fi
+
+          if [[ ! ${{ github.event.pull_request.head.ref }} =~ ^bot/ ]]; then
+            echo "Not in bot folder"
+            exit 78
+          fi
+
+          # check if PR touches files other than SOURCE_DATE_EPOCH
+          if [[ $(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -v SOURCE_DATE_EPOCH) ]]; then
+            echo "Not only SOURCE_DATE_EPOCH"
+            exit 78
+          fi
+
+      - name: Approve PR
+        run: gh pr review --approve --body "Auto-Approve" "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
