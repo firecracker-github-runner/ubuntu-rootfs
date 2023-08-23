@@ -34,7 +34,7 @@ jobs:
           fi
 
           changes=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
-          if [$? -ne 0 ]; then
+          if [[ $? -ne 0 ]]; then
             echo "Failed to get diff"
             exit 78
           fi
