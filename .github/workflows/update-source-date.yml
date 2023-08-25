@@ -6,7 +6,7 @@ permissions:
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 0 * * *"
 
 jobs:
   update_source_data_epoch:
