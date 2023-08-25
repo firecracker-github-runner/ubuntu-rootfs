@@ -82,11 +82,14 @@ function build_rootfs {
     apply_variant_chroot $variant $rootfs
 
     # Go for some last space saving
-    sudo rm -rf "${rootfs}/var/log" \
-        "${rootfs}/var/cache" \
+    sudo rm -rf "${rootfs}/var/log/*" \
+        "${rootfs}/var/cache/*" \
         "${rootfs}/var/lib/apt/lists" \
         "${rootfs}/usr/share/bash-completion" \
         "${rootfs}/tmp/*"
+
+    # It's not supposed to, but APT seems to need this
+    sudo mkdir -p /var/cache/apt/archives/partial
 
     local rootfs_img="$OUTPUT_DIR/ubuntu-${variant}-22.04.squashfs"
     sudo mksquashfs $rootfs $rootfs_img -all-root -noappend -mkfs-time 0 -all-time 0 -no-progress -no-xattrs -comp zstd -Xcompression-level 19 -no-recovery -b 1M
