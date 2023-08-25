@@ -23,5 +23,9 @@ cat >>/etc/sysctl.conf <<EOF
 kernel.unprivileged_bpf_disabled=1
 EOF
 
+systemd-machine-id-setup --print
+rm /var/lib/dbus/machine-id || true
+ln -s /etc/machine-id /var/lib/dbus/machine-id
+
 # This gets pulled out by the build script
 dpkg-query --show >/root/manifest
