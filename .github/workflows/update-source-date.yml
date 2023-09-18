@@ -32,7 +32,7 @@ jobs:
 
       - name: Create PR
         id: pr
-        uses: peter-evans/create-pull-request@0cd7ff0e63a08ac27378fc70cf0df976be6bbbfa
+        uses: peter-evans/create-pull-request@a05bf394bea84a3b732877fcc92a5fa7a09069c3
         with:
           add-paths: |
             SOURCE_DATE_EPOCH
