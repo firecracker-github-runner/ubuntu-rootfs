@@ -1,7 +1,6 @@
 #!/bin/bash
 
-set -eu -o pipefail
-set -x
+set -eux -o pipefail
 
 cd $(dirname $0)
 
