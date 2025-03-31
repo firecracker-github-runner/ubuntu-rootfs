@@ -6,9 +6,10 @@ ENV TZ=Etc/UTC
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
   ca-certificates \
+  git \
+  mmdebstrap \
   squashfs-tools \
   tree \
-  mmdebstrap \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 

@@ -7,22 +7,18 @@ cd $(dirname $0)
 passwd -d root
 
 # clean up unneeded things
-rm -vf /etc/systemd/system/timers.target.wants/*
-systemctl disable e2scrub_reap.service
 rm -r /home
 rm -r /media
 
-rm -f /etc/systemd/system/multi-user.target.wants/systemd-resolved.service
-rm -f /etc/systemd/system/dbus-org.freedesktop.resolve1.service
-rm -f /etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service
-rm -vf /etc/systemd/system/timers.target.wants/*
+rm -r /etc/systemd/system/getty.target.wants
+rm -r /etc/systemd/system/multi-user.target.wants
+rm -r /etc/systemd/system/sysinit.target.wants
+rm -r /etc/systemd/system/timers.target.wants
 
-cat >>/etc/sysctl.conf <<EOF
-# This avoids a SPECTRE vuln
-kernel.unprivileged_bpf_disabled=1
-EOF
+# see: https://bugs.launchpad.net/ubuntu/+source/shadow/+bug/2060676
+sed -i -e '/ pam_lastlog.so$/s/^/# /' /etc/pam.d/login
 
-systemd-machine-id-setup --print
+truncate -s 0 /etc/machine-id
 rm /var/lib/dbus/machine-id || true
 ln -s /etc/machine-id /var/lib/dbus/machine-id
 

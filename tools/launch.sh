@@ -1,7 +1,6 @@
 #!/bin/bash
 
-set -eu -o pipefail
-set -x
+set -eux -o pipefail
 
 function download() {
     local destination="$1"
@@ -30,22 +29,23 @@ function launch() {
 
     pushd $(dirname $0) >/dev/null
 
-    local image_path="images/ubuntu-${variant}-22.04.squashfs"
+    local image_path="images/ubuntu-${variant}-24.04.squashfs"
     mkdir -p "images"
 
     download "$image_path"
 
     local kernel_params=""
 
+    # see: https://jonathanwoollett-light.github.io/firecracker/book/book/network-setup.html
     local tap_device="tap0"
     local gateway_ip=$(ip route | grep default | awk '{print $3}')
-    local mac_address="AA:FC:00:00:00:01" #$(ip a | grep -A1 ${tap_device} | grep ether | awk '{print $2}')
+    local mac_address="$(ip a | grep -A1 ${tap_device} | grep ether | awk '{print $2}')"
 
     #add ip kernel param: guest-ip:[server-ip]:gateway-ip:netmask:hostname:iface:state
     ip="172.16.0.2"
     gateway_ip="172.16.0.1"
     hostname="ubuntu-1"
-    mask="255.255.255.0"
+    mask="255.255.255.252" #/30
     kernel_params="${kernel_params} ip=${ip}::${gateway_ip}:${mask}:${hostname}:eth0:up"
 
     # if variant is "runner", add kernel opt
@@ -67,7 +67,6 @@ function launch() {
         --tap-device="${tap_device}/${mac_address}" \
         --metadata='{"test":true}' \
         --cpu-template=C3 \
-        --disable-smt \
         --debug
 
     popd >/dev/null

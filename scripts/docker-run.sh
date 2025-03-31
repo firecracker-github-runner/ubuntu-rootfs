@@ -4,7 +4,6 @@ set -eux -o pipefail
 
 function main {
   local extra_args="$@"
-  local commit_hash="$(git rev-parse HEAD)"
 
   mkdir -p ./dist
   mkdir -p ./working
@@ -18,7 +17,6 @@ function main {
     -v ./build.sh:/working/build.sh:ro \
     -v ./SOURCE_DATE_EPOCH:/working/SOURCE_DATE_EPOCH:ro \
     -v ./dist:/working/dist:rw \
-    -e COMMIT_HASH="$commit_hash" \
     $extra_args \
     firecracker-ubuntu-rootfs-working
 }

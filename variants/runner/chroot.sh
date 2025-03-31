@@ -1,14 +1,12 @@
 #!/bin/bash
 
-set -eu -o pipefail
-set -x
+set -eux -o pipefail
 
 cd $(dirname $0)
 
 mkdir -p "/working"
 
 # add user
-passwd -d root
 useradd -s /bin/bash -G sudo -G 0 -M -d /working runner
 passwd -d runner
 chmod g+rwx /working

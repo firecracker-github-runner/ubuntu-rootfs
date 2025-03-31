@@ -65,12 +65,13 @@ function build_rootfs {
     mkdir -p "${rootfs}/rom"
     rm -f "${rootfs}/etc/resolv.conf" # rm symlink
 
-    cp -v $ROOT_DIR/COMMIT_HASH $ROOT_DIR/SOURCE_DATE_EPOCH $rootfs/root/
+    echo "${COMMIT_HASH}" > $rootfs/root/COMMIT_HASH
+    echo "${SOURCE_DATE_EPOCH}" > $rootfs/root/SOURCE_DATE_EPOCH
 
     cp -rvf $base_path/overlay/* $rootfs/
     apply_variant_chroot base $rootfs
 
-    mv -v $rootfs/root/manifest $OUTPUT_DIR/ubuntu-${variant}-22.04.manifest.txt
+    mv -v $rootfs/root/manifest $OUTPUT_DIR/ubuntu-${variant}-24.04.manifest.txt
 
     cp -rvf $variant_path/overlay/* $rootfs/
     apply_variant_chroot $variant $rootfs
@@ -85,7 +86,7 @@ function build_rootfs {
     # It's not supposed to, but APT seems to need this
     mkdir -p /var/cache/apt/archives/partial
 
-    local rootfs_img="$OUTPUT_DIR/ubuntu-${variant}-22.04.squashfs"
+    local rootfs_img="$OUTPUT_DIR/ubuntu-${variant}-24.04.squashfs"
     mksquashfs $rootfs $rootfs_img -all-root -noappend -no-progress -no-xattrs -comp zstd -Xcompression-level 19 -no-recovery -b 1M
 }
 
@@ -106,14 +107,12 @@ function main {
 
     # use SOURCE_DATE_EPOCH for reproducible builds
     export SOURCE_DATE_EPOCH=$(cat ${ROOT_DIR}/SOURCE_DATE_EPOCH)
+    export COMMIT_HASH=$(git rev-parse HEAD)
+    export TZ=Etc/UTC
 
-    # write COMMIT_HASH, so we can include it in the image
-    echo "${COMMIT_HASH}" >${ROOT_DIR}/COMMIT_HASH
+    echo "COMMIT_HASH: $(COMMIT_HASH)"
+    echo "SOURCE_DATE_EPOCH: $(SOURCE_DATE_EPOCH)"
 
-    echo "COMMIT_HASH: $(cat ${ROOT_DIR}/COMMIT_HASH)"
-    echo "SOURCE_DATE_EPOCH: $(cat ${ROOT_DIR}/SOURCE_DATE_EPOCH)"
-
-    build_rootfs minimal
     build_rootfs debug
     build_rootfs runner
     chown -Rc $UID $OUTPUT_DIR
