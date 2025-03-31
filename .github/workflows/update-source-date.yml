@@ -2,7 +2,6 @@ name: Update SOURCE_DATE_EPOCH
 
 permissions:
   contents: read
-  pull-requests: write
 
 on:
   schedule:
@@ -24,11 +23,11 @@ jobs:
         run: |
           echo "${{ steps.timestamp.outputs.timestamp_sec }}" > SOURCE_DATE_EPOCH
 
-      - uses: tibdex/github-app-token@3eb77c7243b85c65e84acfa93fdbac02fb6bd532
-        id: generate-token
+      - uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547
+        id: enerate-token
         with:
-          app_id: ${{ secrets.BOT_APP_ID }}
-          private_key: ${{ secrets.BOT_APP_KEY }}
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_KEY }}
 
       - name: Create PR
         id: pr
