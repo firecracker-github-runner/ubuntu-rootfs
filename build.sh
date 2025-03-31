@@ -25,9 +25,9 @@ function apply_variant_chroot {
     local rootfs=$2
     local variant_path=$(get_variant_path $variant)
     local variant_chroot="${variant_path}/chroot.sh"
-    cp $variant_chroot $rootfs/
-    chroot $rootfs /bin/bash -c "./chroot.sh"
-    rm $rootfs/chroot.sh
+    sudo cp $variant_chroot $rootfs/
+    sudo chroot $rootfs /bin/bash -c "./chroot.sh"
+    sudo rm $rootfs/chroot.sh
 }
 
 # Build a rootfs
@@ -45,7 +45,7 @@ function build_rootfs {
     local variant_packages=$(get_variant_packages $variant)
     local sources_list=$(cat ${base_path}/overlay/etc/apt/sources.list)
 
-    mmdebstrap \
+    sudo mmdebstrap \
         --verbose \
         --arch=amd64 \
         --variant=minbase \
@@ -61,33 +61,36 @@ function build_rootfs {
         "$rootfs" \
         "$sources_list"
 
-    mkdir -p "${rootfs}/overlay"
-    mkdir -p "${rootfs}/rom"
-    rm -f "${rootfs}/etc/resolv.conf" # rm symlink
+    sudo mkdir -p "${rootfs}/overlay"
+    sudo mkdir -p "${rootfs}/rom"
+    sudo rm -f "${rootfs}/etc/resolv.conf" # rm symlink
 
-    echo "${COMMIT_HASH}" > $rootfs/root/COMMIT_HASH
-    echo "${SOURCE_DATE_EPOCH}" > $rootfs/root/SOURCE_DATE_EPOCH
+    echo "${COMMIT_HASH}" | sudo tee $rootfs/root/COMMIT_HASH
+    echo "${SOURCE_DATE_EPOCH}" | sudo tee $rootfs/root/SOURCE_DATE_EPOCH
 
-    cp -rvf $base_path/overlay/* $rootfs/
+    sudo cp -rvf $base_path/overlay/* $rootfs/
     apply_variant_chroot base $rootfs
 
-    mv -v $rootfs/root/manifest $OUTPUT_DIR/ubuntu-${variant}-24.04.manifest.txt
+    local manifest_dest="$OUTPUT_DIR/ubuntu-${variant}-24.04.manifest.txt"
+    sudo cp "$rootfs/root/manifest" "$manifest_dest"
+    sudo chown $UID:$UID "$manifest_dest"
 
-    cp -rvf $variant_path/overlay/* $rootfs/
+    sudo cp -rvf $variant_path/overlay/* $rootfs/
     apply_variant_chroot $variant $rootfs
 
     # Go for some last space saving
-    rm -rf "${rootfs}/var/log/*" \
+    sudo rm -rf "${rootfs}/var/log/*" \
         "${rootfs}/var/cache/*" \
         "${rootfs}/var/lib/apt/lists" \
         "${rootfs}/usr/share/bash-completion" \
         "${rootfs}/tmp/*"
 
     # It's not supposed to, but APT seems to need this
-    mkdir -p /var/cache/apt/archives/partial
+    sudo mkdir -p /var/cache/apt/archives/partial
 
     local rootfs_img="$OUTPUT_DIR/ubuntu-${variant}-24.04.squashfs"
-    mksquashfs $rootfs $rootfs_img -all-root -noappend -no-progress -no-xattrs -comp zstd -Xcompression-level 19 -no-recovery -b 1M
+    sudo mksquashfs $rootfs $rootfs_img -all-root -noappend -no-progress -no-xattrs -comp zstd -Xcompression-level 19 -no-recovery -b 1M
+    sudo chown $UID:$UID $rootfs_img
 }
 
 function generate_img_hashes {
@@ -98,8 +101,8 @@ function generate_img_hashes {
 }
 
 function main {
-    rm -r ${ROOT_DIR}/working || true
-    rm -r ${OUTPUT_DIR} || true
+    sudo rm -r ${ROOT_DIR}/working || true
+    rm -r "${OUTPUT_DIR}" || true
     mkdir -p ${OUTPUT_DIR}
 
     mkdir -p ${ROOT_DIR}/working
@@ -110,12 +113,11 @@ function main {
     export COMMIT_HASH=$(git rev-parse HEAD)
     export TZ=Etc/UTC
 
-    echo "COMMIT_HASH: $(COMMIT_HASH)"
-    echo "SOURCE_DATE_EPOCH: $(SOURCE_DATE_EPOCH)"
+    echo "COMMIT_HASH: $COMMIT_HASH"
+    echo "SOURCE_DATE_EPOCH: $SOURCE_DATE_EPOCH"
 
     build_rootfs debug
     build_rootfs runner
-    chown -Rc $UID $OUTPUT_DIR
 
     generate_img_hashes
 

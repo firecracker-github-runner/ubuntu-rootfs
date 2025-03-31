@@ -9,6 +9,7 @@ RUN apt-get update \
   git \
   mmdebstrap \
   squashfs-tools \
+  sudo \
   tree \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
