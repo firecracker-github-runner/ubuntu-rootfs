@@ -1,19 +1,11 @@
 #!/bin/bash
 
 # fail if we encounter an error, uninitialized variable or a pipe breaks
-set -eu -o pipefail
-set -x
-PS4='+\t '
+set -eux -o pipefail
 
 cd $(dirname $0)
 ROOT_DIR=$PWD
 OUTPUT_DIR=${ROOT_DIR}/dist
-
-# Make sure we have all the needed tools
-function install_dependencies {
-    sudo apt update
-    sudo apt install -y squashfs-tools tree mmdebstrap
-}
 
 function get_variant_path {
     local variant=$1
@@ -51,6 +43,7 @@ function build_rootfs {
     local base_packages=$(get_variant_packages base)
     local variant_path=$(get_variant_path $variant)
     local variant_packages=$(get_variant_packages $variant)
+    local sources_list=$(cat ${base_path}/overlay/etc/apt/sources.list)
 
     sudo mmdebstrap \
         --verbose \
@@ -63,20 +56,24 @@ function build_rootfs {
         --dpkgopt='path-exclude=/usr/share/doc/*' \
         --dpkgopt='path-include=/usr/share/doc/*/copyright' \
         --dpkgopt='path-exclude=/usr/share/{doc,info,man,omf,help,gnome/help}/*' \
-        --format=dir \
-        jammy \
-        $rootfs <$base_path/overlay/etc/apt/sources.list
+        --format=directory \
+        noble \
+        "$rootfs" \
+        "$sources_list"
 
     sudo mkdir -p "${rootfs}/overlay"
     sudo mkdir -p "${rootfs}/rom"
     sudo rm -f "${rootfs}/etc/resolv.conf" # rm symlink
 
-    sudo cp -v $ROOT_DIR/COMMIT_HASH $ROOT_DIR/SOURCE_DATE_EPOCH $rootfs/root/
+    echo "${COMMIT_HASH}" | sudo tee $rootfs/root/COMMIT_HASH
+    echo "${SOURCE_DATE_EPOCH}" | sudo tee $rootfs/root/SOURCE_DATE_EPOCH
 
     sudo cp -rvf $base_path/overlay/* $rootfs/
     apply_variant_chroot base $rootfs
 
-    sudo mv -v $rootfs/root/manifest $OUTPUT_DIR/ubuntu-${variant}-22.04.manifest.txt
+    local manifest_dest="$OUTPUT_DIR/ubuntu-${variant}-24.04.manifest.txt"
+    sudo cp "$rootfs/root/manifest" "$manifest_dest"
+    sudo chown $UID:$UID "$manifest_dest"
 
     sudo cp -rvf $variant_path/overlay/* $rootfs/
     apply_variant_chroot $variant $rootfs
@@ -91,8 +88,9 @@ function build_rootfs {
     # It's not supposed to, but APT seems to need this
     sudo mkdir -p /var/cache/apt/archives/partial
 
-    local rootfs_img="$OUTPUT_DIR/ubuntu-${variant}-22.04.squashfs"
-    sudo mksquashfs $rootfs $rootfs_img -all-root -noappend -mkfs-time 0 -all-time 0 -no-progress -no-xattrs -comp zstd -Xcompression-level 19 -no-recovery -b 1M
+    local rootfs_img="$OUTPUT_DIR/ubuntu-${variant}-24.04.squashfs"
+    sudo mksquashfs $rootfs $rootfs_img -all-root -noappend -no-progress -no-xattrs -comp zstd -Xcompression-level 19 -no-recovery -b 1M
+    sudo chown $UID:$UID $rootfs_img
 }
 
 function generate_img_hashes {
@@ -104,25 +102,22 @@ function generate_img_hashes {
 
 function main {
     sudo rm -r ${ROOT_DIR}/working || true
-    sudo rm -r ${OUTPUT_DIR} || true
+    rm -r "${OUTPUT_DIR}" || true
     mkdir -p ${OUTPUT_DIR}
 
     mkdir -p ${ROOT_DIR}/working
     pushd ${ROOT_DIR}/working >/dev/null
 
-    /usr/bin/git log -1 --format='%H' >${ROOT_DIR}/COMMIT_HASH
-
     # use SOURCE_DATE_EPOCH for reproducible builds
     export SOURCE_DATE_EPOCH=$(cat ${ROOT_DIR}/SOURCE_DATE_EPOCH)
+    export COMMIT_HASH=$(git rev-parse HEAD)
+    export TZ=Etc/UTC
 
-    echo "COMMIT_HASH: $(cat ${ROOT_DIR}/COMMIT_HASH)"
-    echo "SOURCE_DATE_EPOCH: $(cat ${ROOT_DIR}/SOURCE_DATE_EPOCH)"
+    echo "COMMIT_HASH: $COMMIT_HASH"
+    echo "SOURCE_DATE_EPOCH: $SOURCE_DATE_EPOCH"
 
-    install_dependencies
-    build_rootfs minimal
     build_rootfs debug
     build_rootfs runner
-    sudo chown -Rc $USER. $OUTPUT_DIR
 
     generate_img_hashes
 

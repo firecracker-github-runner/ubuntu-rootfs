@@ -1,1 +1,1 @@
-apt,bash,curl,iproute2,ca-certificates,vim,socat,wget
+curl,iproute2,ca-certificates,vim,socat,wget,iputils-ping
