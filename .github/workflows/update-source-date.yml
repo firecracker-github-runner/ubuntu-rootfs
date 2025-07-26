@@ -23,7 +23,7 @@ jobs:
         run: |
           echo "${{ steps.timestamp.outputs.timestamp_sec }}" > SOURCE_DATE_EPOCH
 
-      - uses: actions/create-github-app-token@a3c826a2042b1cef171cbabedfd93c93623f4061
+      - uses: actions/create-github-app-token@d7ee28121512479a18a428398f948ac5ce15fb4c
         id: generate-token
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
