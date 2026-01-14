@@ -30,7 +30,7 @@ jobs:
           ./build.sh
 
       - name: Create Release
-        uses: "softprops/action-gh-release@0adea5aa98b89355a3ff602e3f2d18bc4d77e7aa"
+        uses: "softprops/action-gh-release@78237c54eb15310cb292a15480c4be010be47aeb"
         with:
           tag_name: ${{ steps.timestamp.outputs.timestamp }}
           generate_release_notes: true
