@@ -1,4 +1,4 @@
-FROM ubuntu:noble@sha256:68ee22004a9109b44973313b02ff7b1de250f1de0f5ecb628d73f579aaff33ac
+FROM ubuntu:resolute@sha256:c098726dd9b9733f3e885f8de0ef375206a311b0a317eadc40d347b1115fb944
 
 ENV DEBIAN_FRONTEND=noninteractive 
 ENV TZ=Etc/UTC
